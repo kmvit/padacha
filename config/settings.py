@@ -33,6 +33,8 @@ ADMIN_PATH = os.getenv("ADMIN_PATH", "upravlenie/")
 
 SITE_URL = "https://padacha.ru"
 METRIKA = 112273830
+# Реквизиты в подвале и почта в контактах — одни на весь сайт
+COMPANY = {"name": "ИП Галкин А. В.", "inn": "261805834332", "email": "info@padacha.ru"}
 
 INSTALLED_APPS = [
     "django.contrib.admin",

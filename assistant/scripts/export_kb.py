@@ -182,6 +182,9 @@ def contacts(page: str) -> dict:
     max_ = re.search(r'href="(https://max\.ru/[^"]+)"', block)
     if max_:
         out["max"] = max_.group(1)
+    email = re.search(r'href="mailto:([^"]+)"', block)
+    if email:
+        out["почта"] = email.group(1)
     return out
 
 

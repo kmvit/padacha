@@ -59,7 +59,7 @@
 
 <footer>
   <div class="wrap foot">
-    <span>© {% now "Y" %} Падача — система управления кафе</span>
+    <span>© {% now "Y" %} Падача — система управления кафе<br>{{ COMPANY.name }}, ИНН {{ COMPANY.inn }} · <a href="mailto:{{ COMPANY.email }}">{{ COMPANY.email }}</a></span>
     {% footer_links %}
   </div>
 </footer>
@@ -81,6 +81,7 @@
       var goal =
         h.indexOf("#call") !== -1 ? "click_connect" :
         h.indexOf("tel:") === 0 ? "click_phone" :
+        h.indexOf("mailto:") === 0 ? "click_email" :
         /wa\.me|t\.me|max\.ru/.test(h) ? "click_messenger" :
         h.indexOf("demo.padacha.ru") !== -1 ? "click_demo" : null;
       if (goal) ym({{ METRIKA }}, "reachGoal", goal);

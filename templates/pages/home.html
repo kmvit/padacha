@@ -13,7 +13,7 @@
     <p class="fname" id="fname">Падача</p>
     <div class="fstripe" id="fstripe"></div>
     <div class="fgrid">
-      <span>© {% now "Y" %} Падача — система управления кафе</span>
+      <span>© {% now "Y" %} Падача — система управления кафе<br>{{ COMPANY.name }}, ИНН {{ COMPANY.inn }} · <a href="mailto:{{ COMPANY.email }}">{{ COMPANY.email }}</a></span>
       {% home_footer_links %}
     </div>
   </div>
@@ -356,6 +356,7 @@
       var goal =
         h === "#call" ? "click_connect" :
         h.indexOf("tel:") === 0 ? "click_phone" :
+        h.indexOf("mailto:") === 0 ? "click_email" :
         /wa\.me|t\.me|max\.ru/.test(h) ? "click_messenger" :
         h.indexOf("demo.padacha.ru") !== -1 ? "click_demo" : null;
       if (goal) ym({% endverbatim %}{{ METRIKA }}{% verbatim %}, "reachGoal", goal);

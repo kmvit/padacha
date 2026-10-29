@@ -63,7 +63,10 @@ class KnowledgeBase:
         pretty = phone
         if phone.startswith("+7") and len(phone) == 12:
             pretty = f"+7 {phone[2:5]} {phone[5:8]}-{phone[8:10]}-{phone[10:12]}"
-        return f"{pretty} — звонок, WhatsApp или Telegram"
+        line = f"{pretty} — звонок, WhatsApp или Telegram"
+        if c.get("почта"):
+            line += f", или письмо на {c['почта']}"
+        return line
 
     @property
     def tariffs(self) -> list[dict]:

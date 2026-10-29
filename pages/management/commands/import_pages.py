@@ -15,6 +15,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from pages.contacts import with_email
 from pages.models import ARTICLES, LEAD_FORM, Page
 
 ROOT = settings.LEGACY_DIR
@@ -117,7 +118,7 @@ def parse(path: str, file: str) -> dict:
         "layout": Page.Layout.HOME if home else Page.Layout.INNER,
         "head": extra_head,
         "jsonld": jsonld,
-        "body": with_form(body),
+        "body": with_email(with_form(body)),
     }
 
 
