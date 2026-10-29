@@ -24,15 +24,23 @@ TLS снимает прокси Jino (195.161.41.70), nginx на VPS слуша�
 
 ## 1. Старый сервер: отдельное имя для пульта
 
-1. DNS: `A pult.padacha.ru` → IP старого сервера.
+Оба сервера — VPS Jino, и `padacha.ru` (как и любой `*.padacha.ru`)
+уже смотрит на прокси Jino 195.161.41.70. Куда прокси отправит домен,
+решает привязка в панели Jino, а не A-запись. Пока `pult.padacha.ru`
+никуда не привязан, прокси отвечает на него 400.
+
+1. В панели Jino привязать `pult.padacha.ru` к старому VPS
+   (`a318f7177847.vps.myjino.ru`) и выпустить для него сертификат.
 2. На старом сервере — server-блок `server_name pult.padacha.ru;` с теми же
    локациями `/pult/`, `/api/license/`, `/pult-static/`, что сейчас в
    `/etc/nginx/sites-available/padacha`, затем:
 
    ```bash
    sudo nginx -t && sudo systemctl reload nginx
-   sudo certbot --nginx -d pult.padacha.ru
    ```
+
+   (если старый VPS сам держит сертификаты через certbot, как для
+   padacha.ru, — ещё `sudo certbot --nginx -d pult.padacha.ru`)
 
 3. В `/opt/padacha/pult/.env` дописать `pult.padacha.ru` в
    `DJANGO_ALLOWED_HOSTS`, перезапустить `padacha-pult`.
@@ -62,7 +70,7 @@ cd /opt/padacha
 .venv/bin/python manage.py import_articles
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py collectstatic --noinput
-chown -R www-data:www-data var staticfiles
+chown -R www-data:www-data var staticfiles .env && chmod 640 .env
 ```
 
 `import_pages` создаёт черновик `/soglasie/` — согласие на обработку
@@ -120,9 +128,10 @@ curl -sI -H 'Host: hack-its.ru' http://127.0.0.1/             # соседа н�
 
 ## 6. Переключение
 
-1. За сутки снизить TTL записей `padacha.ru` и `www.padacha.ru` до 300.
-2. В панели Jino привязать домены `padacha.ru` и `www.padacha.ru` к этому
-   VPS и выпустить для них сертификат (как для hack-its.ru).
+1. Убедиться, что шаг 1 сделан: `https://pult.padacha.ru/api/license/`
+   отвечает, иначе после переключения инстансы заведений потеряют лицензии.
+2. Проверить сертификат для `padacha.ru` и `www.padacha.ru` в панели Jino
+   (для привязки к hackit он нужен на прокси, как у hack-its.ru).
 3. Если после 29.10 что-то правили в `padacha-landing`, перенести сюда:
    новые статьи `content/blog/*.md` → `content/blog/` и `import_articles`;
    правки страниц → `legacy/` и `import_pages --force` (перезапишет правки,
@@ -130,8 +139,9 @@ curl -sI -H 'Host: hack-its.ru' http://127.0.0.1/             # соседа н�
 4. В Яндекс Метрике (счётчик 112273830) добавить цель «JavaScript-событие»
    `lead_form` — её шлёт форма заявки после отправки. Цели кликов
    (`click_connect`, `click_phone`, `click_messenger`, `click_demo`) прежние.
-5. Направить `padacha.ru` и `www.padacha.ru` на прокси Jino (как у
-   hack-its.ru).
+5. В панели Jino перепривязать `padacha.ru` и `www.padacha.ru` со старого
+   VPS на hackit (`cf24caf415b6.vps.myjino.ru`). DNS менять не нужно —
+   домен уже смотрит на прокси Jino; откат — привязать обратно.
 6. Проверить: главная, статья, отправка заявки (появляется в админке),
    `https://padacha.ru/pult/` открывает вход в пульт, ассистент отвечает.
 7. На старом сервере выключить cron `tools/publish.sh` и отдачу сайта —
