@@ -24,6 +24,10 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+# Изнутри сервера сайт открывает ассистент — за главной с ценами и FAQ
+# (KB_SITE_URL=http://127.0.0.1:8120/). Снаружи сюда так не попасть: nginx
+# пропускает только padacha.ru.
+ALLOWED_HOSTS += [h for h in ("127.0.0.1", "localhost") if h not in ALLOWED_HOSTS]
 CSRF_TRUSTED_ORIGINS = [o for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o]
 ADMIN_PATH = os.getenv("ADMIN_PATH", "upravlenie/")
 
