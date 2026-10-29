@@ -1,0 +1,354 @@
+{% extends "base.html" %}{% load site %}
+{# Главная: своя вёрстка. Head (шрифты, стили, Метрика) — в поле «Дополнительно в <head>», #}
+{# тело — в поле страницы; здесь только код: шапка, подвал, док, ассистент и скрипты. #}
+{% block head %}{{ page.head|safe }}{% endblock %}
+{% block body %}<div class="grain" id="grain" aria-hidden="true"></div>
+
+{% site_header meta.path %}
+
+{{ body }}
+
+<footer>
+  <div class="wrap">
+    <p class="fname" id="fname">Падача</p>
+    <div class="fstripe" id="fstripe"></div>
+    <div class="fgrid">
+      <span>© {% now "Y" %} Падача — система управления кафе</span>
+      {% home_footer_links %}
+    </div>
+  </div>
+</footer>{% verbatim %}
+
+<div class="dock" id="dock">
+  <span class="dstat"><span class="dot" aria-hidden="true"></span>Смена открыта · <span id="clock2">19:42</span></span>
+  <span class="dsum">от 3 990 ₽ в месяц</span>
+  <a class="btn" href="#call">Подключить</a>
+</div>
+
+<button class="ask-btn" id="askOpen" type="button">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H8l-4 4V5Z" stroke-linejoin="round"/></svg>
+  Спросить
+</button>
+<div class="ask-panel" id="askPanel" hidden role="dialog" aria-label="Вопрос о работе Падачи">
+  <div class="ask-head">
+    <div><b>Ассистент «Падачи»</b><span>Отвечает по документации сервиса</span></div>
+    <button class="ask-close" id="askClose" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="ask-log" id="askLog"></div>
+  <form class="ask-form" id="askForm">
+    <input id="askInput" type="text" placeholder="Например: как считается себестоимость" maxlength="1000" autocomplete="off">
+    <button type="submit" id="askSend" aria-label="Отправить">→</button>
+  </form>
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ── Часы смены и дата на чипе ─────────────────────────────────────── */
+  var mins = 19 * 60 + 42;
+  var clocks = [document.getElementById("clock"), document.getElementById("clock2")];
+  function paintClock() {
+    var h = String(Math.floor(mins / 60) % 24).padStart(2, "0");
+    var m = String(mins % 60).padStart(2, "0");
+    clocks.forEach(function (el) { if (el) el.textContent = h + ":" + m; });
+  }
+  paintClock();
+  if (!reduce) setInterval(function () { mins += 1; paintClock(); }, 8000);
+
+  var days = ["ВС", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ"];
+  var months = ["ЯНВ", "ФЕВ", "МАР", "АПР", "МАЯ", "ИЮН", "ИЮЛ", "АВГ", "СЕН", "ОКТ", "НОЯ", "ДЕК"];
+  var now = new Date();
+  var chip = document.getElementById("datechip");
+  if (chip) chip.textContent = days[now.getDay()] + " · " + now.getDate() + " " + months[now.getMonth()];
+
+  /* ── Переключатель периода оплаты ──────────────────────────────────── */
+  var periodBtns = document.querySelectorAll(".switch button");
+  periodBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var period = btn.dataset.period;
+      periodBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+      document.querySelectorAll(".price").forEach(function (el) { el.textContent = el.dataset[period]; });
+      document.querySelectorAll(".per").forEach(function (el) {
+        el.textContent = period === "year" ? "в месяц, при оплате за год" : "в месяц за заведение";
+      });
+    });
+  });
+
+  /* ── Появление блоков ──────────────────────────────────────────────── */
+  var marks = document.querySelectorAll(".sechead, .scrub, .bill, .cat, .role, .step, .shout, .cell");
+  if (reduce || !("IntersectionObserver" in window)) {
+    marks.forEach(function (el) { el.classList.add("in"); });
+    document.querySelectorAll(".tile").forEach(function (t) { t.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px" });
+    marks.forEach(function (el) { io.observe(el); });
+
+    /* Мозаика собирается из разлёта — как плитки, которые разложили на доске */
+    var tiles = [].slice.call(document.querySelectorAll(".mosaic .tile"));
+    tiles.forEach(function (tile, i) {
+      var dx = (Math.random() * 2 - 1) * 180;
+      var dy = (Math.random() * 2 - 1) * 140;
+      var rot = (Math.random() * 2 - 1) * 14;
+      tile.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)";
+      setTimeout(function () {
+        tile.classList.add("in");
+        tile.style.transform = "none";
+      }, 120 + i * 45);
+    });
+  }
+
+  /* ── Бегущая строка: быстрее при прокрутке ─────────────────────────── */
+  var track = document.getElementById("mtrack");
+  if (track && !reduce) {
+    track.innerHTML += track.innerHTML;
+    var x = 0, lastY = window.scrollY, boost = 0;
+    var half = 0;
+    requestAnimationFrame(function step() {
+      if (!half) half = track.scrollWidth / 2;
+      var y = window.scrollY;
+      boost = Math.min(7, Math.abs(y - lastY) * 0.35) * 0.3 + boost * 0.7;
+      lastY = y;
+      x -= 0.6 + boost;
+      if (half && -x >= half) x += half;
+      track.style.transform = "translateX(" + x + "px)";
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ── Станции: вкладка показывает свою панель ───────────────────────── */
+  var tabs = document.getElementById("tabs");
+  var screenBox = document.getElementById("screen");
+  if (tabs && screenBox) {
+    var panes = {};
+    [].slice.call(screenBox.querySelectorAll("[data-pane]")).forEach(function (el) {
+      panes[el.dataset.pane] = el;
+    });
+    var capRole = document.getElementById("screenRole");
+    var capWhat = document.getElementById("screenWhat");
+    var capText = document.getElementById("screenCap");
+    var items = [].slice.call(tabs.querySelectorAll(".tab"));
+    var shown = items.filter(function (t) { return t.getAttribute("aria-selected") === "true"; })[0] || items[0];
+
+    var paint = function (tab) {
+      for (var key in panes) panes[key].hidden = key !== tab.dataset.pane;
+      capRole.textContent = tab.dataset.role;
+      capWhat.textContent = tab.dataset.what;
+      capText.textContent = tab.dataset.cap;
+      screenBox.classList.remove("swap");
+    };
+
+    var show = function (tab) {
+      if (tab === shown) return;
+      shown = tab;
+      items.forEach(function (t) { t.setAttribute("aria-selected", String(t === tab)); });
+      if (reduce) { paint(tab); return; }
+      screenBox.classList.add("swap");
+      setTimeout(function () { paint(tab); }, 150);
+    };
+
+    items.forEach(function (tab) {
+      tab.addEventListener("mouseenter", function () { show(tab); });
+      tab.addEventListener("focus", function () { show(tab); });
+      tab.addEventListener("click", function () { show(tab); });
+    });
+    paint(shown);
+  }
+
+  /* ── Промо-ролик. На широком экране заводим сам и без звука: автозапуск со
+     звуком браузер запретит, да и говорящее видео в лицо гостю невежливо.
+     Нажали ▶ — значит, звук уместен. ─────────────────────────────────── */
+  var promo = document.getElementById("promo");
+  var play = document.getElementById("play");
+  var sound = document.getElementById("sound");
+  if (promo && play && sound) {
+    var start = function () {
+      promo.preload = "auto";
+      var pr = promo.play();
+      if (pr && pr.catch) pr.catch(function () { play.hidden = false; });
+    };
+    // кнопку прячем, только когда ролик реально пошёл
+    promo.addEventListener("playing", function () { play.hidden = true; sound.hidden = false; });
+    promo.addEventListener("pause", function () { play.hidden = false; });
+    promo.addEventListener("click", function () { if (promo.paused) start(); else promo.pause(); });
+    promo.addEventListener("ended", function () { play.hidden = false; promo.currentTime = 0; });
+    play.addEventListener("click", function () {
+      promo.muted = false;
+      sound.textContent = "Звук вкл";
+      start();
+    });
+    sound.addEventListener("click", function () {
+      promo.muted = !promo.muted;
+      sound.textContent = promo.muted ? "Звук выкл" : "Звук вкл";
+      if (!promo.muted) promo.play();
+    });
+    if (window.innerWidth >= 900 && !reduce) start();
+  }
+
+  /* ── Нижняя панель и зерно ─────────────────────────────────────────── */
+  var dock = document.getElementById("dock");
+  var grain = document.getElementById("grain");
+  var call = document.getElementById("call");
+  function onScroll() {
+    var y = window.scrollY;
+    if (dock) {
+      var nearCall = call && call.getBoundingClientRect().top < window.innerHeight;
+      dock.classList.toggle("up", y > 520 && !nearCall);
+    }
+    if (grain && !reduce) grain.style.transform = "translateY(" + (y * 0.06) + "px)";
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+<script>
+  /* Ассистент: отдельный блок, работает и при prefers-reduced-motion. Сессия
+     открывается лениво, при первом клике: заглянувший на сайт человек, который
+     кнопку не нажал, не занимает у сервиса место в лимите открытых диалогов. */
+  (function () {
+    var API = "/api/assistant";
+    var btn = document.getElementById("askOpen");
+    var panel = document.getElementById("askPanel");
+    var closeBtn = document.getElementById("askClose");
+    var log = document.getElementById("askLog");
+    var form = document.getElementById("askForm");
+    var input = document.getElementById("askInput");
+    var send = document.getElementById("askSend");
+    if (!btn || !panel || !form) return;
+
+    var sessionId = null;
+    var starting = null;
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    var LINK_LABELS = { "wa.me": "WhatsApp", "t.me": "Telegram", "max.ru": "MAX" };
+
+    function linkify(text) {
+      // один проход одним регэкспом: иначе цифры номера внутри «t.me/+7…»
+      // повторно попадают под телефонный шаблон и рвут уже готовую ссылку
+      var pattern = /(https?:\/\/[^\s<]+)|(\+7[\s-]?\d{3}[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2})/g;
+      return escapeHtml(text).replace(pattern, function (m, url) {
+        if (url) {
+          var trail = "";
+          var t = url.match(/[.,;:!?)]+$/);
+          if (t) { trail = t[0]; url = url.slice(0, -trail.length); }
+          var label = url;
+          try {
+            var host = new URL(url).hostname.replace(/^www\./, "");
+            if (LINK_LABELS[host]) label = LINK_LABELS[host];
+          } catch (e) { /* не распарсился — покажем адрес как есть */ }
+          return '<a href="' + url + '" target="_blank" rel="noreferrer">' + label + "</a>" + trail;
+        }
+        return '<a href="tel:+7' + m.replace(/\D/g, "").slice(1) + '">' + m + "</a>";
+      });
+    }
+
+    function bubble(role, text) {
+      var el = document.createElement("div");
+      el.className = "ask-msg " + role;
+      if (role === "bot") el.innerHTML = linkify(text);
+      else el.textContent = text;
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+      return el;
+    }
+
+    function ensureSession() {
+      if (sessionId) return Promise.resolve();
+      if (starting) return starting;
+      starting = fetch(API + "/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d.session_id) throw new Error("no session");
+          sessionId = d.session_id;
+          bubble("bot", d.greeting || "Здравствуйте.");
+        })
+        .catch(function () {
+          bubble("bot", "Ассистент сейчас недоступен. Напишите нам напрямую — контакты внизу страницы.");
+        })
+        .finally(function () { starting = null; });
+      return starting;
+    }
+
+    btn.addEventListener("click", function () {
+      panel.hidden = false;
+      btn.hidden = true;
+      ensureSession().then(function () { input.focus(); });
+    });
+    closeBtn.addEventListener("click", function () { panel.hidden = true; btn.hidden = false; });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !panel.hidden) { panel.hidden = true; btn.hidden = false; }
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      send.disabled = true;
+      bubble("me", text);
+      var waiting = bubble("wait", "печатает…");
+
+      ensureSession()
+        .then(function () {
+          return fetch(API + "/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sessionId, message: text }),
+          });
+        })
+        .then(function (r) {
+          if (r.status === 410) {
+            // сессия истекла — открываем новую и повторяем тот же вопрос молча
+            sessionId = null;
+            waiting.remove();
+            return ensureSession().then(function () {
+              return fetch(API + "/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ session_id: sessionId, message: text }),
+              }).then(function (r2) { return r2.json(); });
+            });
+          }
+          return r.json();
+        })
+        .then(function (d) {
+          if (waiting.parentNode) waiting.remove();
+          bubble("bot", d.reply || d.message || "Не получилось ответить — попробуйте ещё раз.");
+        })
+        .catch(function () {
+          if (waiting.parentNode) waiting.remove();
+          bubble("bot", "Не получилось отправить сообщение. Проверьте связь и попробуйте ещё раз.");
+        })
+        .finally(function () { send.disabled = false; input.focus(); });
+    });
+  })();
+</script>
+{% endverbatim %}{% if meta.jsonld %}<script type="application/ld+json">
+{{ meta.jsonld|safe }}
+</script>
+{% endif %}{% verbatim %}<script>
+  /* Цели Метрики: имена согласованы с кампанией Директа (direct/kampaniya-poisk-skfo.md) */
+  (function () {
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a || typeof ym !== "function") return;
+      var h = a.getAttribute("href");
+      var goal =
+        h === "#call" ? "click_connect" :
+        h.indexOf("tel:") === 0 ? "click_phone" :
+        /wa\.me|t\.me|max\.ru/.test(h) ? "click_messenger" :
+        h.indexOf("demo.padacha.ru") !== -1 ? "click_demo" : null;
+      if (goal) ym({% endverbatim %}{{ METRIKA }}{% verbatim %}, "reachGoal", goal);
+    });
+  })();
+</script>
+{% endverbatim %}{% endblock %}

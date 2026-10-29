@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+
+# Django: секреты, база, собранная статика админки, venv
+.venv/
+.env
+var/
+staticfiles/
+
+# Ассистент
+assistant/.venv/
+assistant/.env
+assistant/data/kb.json
+
+# Мусор редакторов и ОС
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.log
+.claude/

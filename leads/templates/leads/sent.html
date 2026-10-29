@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block main %}<main>
+  <div class="page-hero">
+    <div class="wrap">
+      <div class="lbl">{% if ok %}Заявка принята{% else %}Не получилось{% endif %}</div>
+      <h1>{% if ok %}Спасибо!<br>Перезвоним в течение рабочего дня{% else %}Заявка не отправилась{% endif %}</h1>
+      <p class="lede">{% if ok %}Если удобнее не ждать — позвоните или напишите, ответим сразу.{% else %}{{ error }}{% endif %}</p>
+      <div class="btns">
+        <a class="btn" href="tel:+79943121222">Позвонить · +7 994 312-12-22</a>
+        <a class="btn ghost" href="/">На главную</a>
+      </div>
+    </div>
+  </div>
+</main>{% endblock %}

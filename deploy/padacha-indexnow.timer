@@ -1,0 +1,12 @@
+# Раз в 15 минут: статья вышла по времени — поисковик узнаёт в течение четверти часа.
+#   sudo cp padacha-indexnow.service padacha-indexnow.timer /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now padacha-indexnow.timer
+[Unit]
+Description=IndexNow для статей padacha.ru — каждые 15 минут
+
+[Timer]
+OnCalendar=*:0/15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

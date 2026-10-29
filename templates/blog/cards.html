@@ -1,0 +1,6 @@
+{% for a in articles %}        <a href="/blog/{{ a.slug }}/">
+          <div class="meta">{{ a.meta|default:"Статья" }}</div>
+          <h2>{{ a.heading_line|safe }}</h2>
+          <p>{{ a.card|default:a.description }}</p>
+        </a>
+{% endfor %}

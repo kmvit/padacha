@@ -1,0 +1,10 @@
+# Отправка вышедших статей в IndexNow. Запускается таймером padacha-indexnow.timer.
+[Unit]
+Description=IndexNow для статей padacha.ru
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/padacha
+ExecStart=/opt/padacha/.venv/bin/python manage.py indexnow

@@ -1,0 +1,222 @@
+#!/usr/bin/env python3
+"""Сборка базы знаний ассистента в один снапшот data/kb.json.
+
+Тарифы и частые вопросы берутся ПРЯМО из index.html — сайт остаётся
+единственным источником цен. Дублировать их в файлах ассистента нельзя:
+две копии неизбежно разъедутся, и ассистент назовёт клиенту цену,
+которой на сайте нет.
+
+Знание о работе продукта лежит в data/product/*.json и правится руками —
+на сайте этих подробностей нет и не будет.
+
+Главная живёт в базе сайта (Django в корне репозитория), поэтому её html
+берётся у самого сайта: KB_SITE_URL=http://127.0.0.1:8120/ в юните. Без
+переменной — legacy/index.html, снимок главной до переезда на Django.
+
+    python -m scripts.export_kb
+"""
+from __future__ import annotations
+
+import html
+import json
+import os
+import re
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+SITE = BASE.parent / "legacy" / "index.html"
+PRODUCT = BASE / "data" / "product"
+OUT = BASE / "data" / "kb.json"
+
+
+def text(raw: str) -> str:
+    """Разметку долой, пробелы схлопнуть.
+
+    Обрезок в конце (`<section class="deep"`) убираем отдельно: срез страницы
+    рвёт тег посередине, и обычное `<[^>]+>` его не ловит."""
+    raw = re.sub(r"<[^>]*$", " ", raw)
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", raw))).strip()
+
+
+def section(page: str, start: str, end: str) -> str:
+    a = page.index(start)
+    return page[a : page.index(end, a)]
+
+
+def plan_items(card: str) -> dict:
+    """Строки карточки тарифа. Карточка разбита на группы («Заказ и касса»,
+    «Бэк-офис») заголовками li.grp — они становятся префиксом строк, а не
+    отдельными пунктами. li.no — то, чего в тарифе нет: в «входит» ему не место,
+    иначе ассистент прочтёт «Экраны кухни и бара» как включённые."""
+    group, included, missing = "", [], []
+    for cls, li in re.findall(r'<li(?:\s+class="([^"]*)")?[^>]*>(.*?)</li>', card, re.S):
+        item = text(li)
+        if "grp" in cls.split():
+            group = item
+        elif "no" in cls.split():
+            missing.append(item)
+        else:
+            included.append(f"{group}: {item}" if group else item)
+    return {"входит": included, "нет_в_тарифе": missing}
+
+
+def includes(page: str, plan: str) -> list[str]:
+    """Состав тарифа из раздела «Вся система»: строки с пометкой «Оба» плюс
+    строки своего тарифа. В ризографической вёрстке состав живёт там, а не
+    в карточке цены."""
+    try:
+        block = section(page, 'id="system"', 'id="pricing"')
+    except ValueError:
+        return []
+    out = []
+    for row in re.findall(r'<div class="mrow">(.*?)</div>\s*(?=<div class="mrow"|</div>)', block, re.S):
+        name = re.search(r'<span class="nm">(.*?)</span>', row, re.S)
+        mark = re.search(r'<span class="pr">(.*?)</span>', row, re.S)
+        if not (name and mark):
+            continue
+        # В «входит» — только то, что тариф действительно включает. Строки
+        # с ценой (фотостудия, подключение) и «скоро» сюда не идут: ассистент
+        # прочёл бы их как включённые и продал клиенту то, за что надо платить.
+        tag = text(mark.group(1)).lower()
+        if tag in {"оба", plan.lower()}:
+            out.append(text(name.group(1)))
+    return out
+
+
+def riso_cards(page: str, block: str) -> list[dict]:
+    """Карточки тарифов в ризографической вёрстке: цена в .cprice, описание
+    в <p>, а состав приходится брать из раздела «Вся система»."""
+    plans = []
+    for cell in re.findall(r'<div class="cell[^"]*">(.*?)(?=<div class="cell|</div>\s*<p class="fine")', block, re.S):
+        price = re.search(r'data-month="([^"]*)"\s+data-year="([^"]*)"', cell)
+        name = re.search(r"<h3>(.*?)</h3>", cell, re.S)
+        if not (name and price):
+            continue
+        who = re.search(r"<p>(.*?)</p>", cell, re.S)
+        plan = text(name.group(1))
+        plans.append({
+            "тариф": plan,
+            "в_месяц": text(price.group(1)),
+            "при_оплате_за_год": text(price.group(2)),
+            "кому": text(who.group(1)) if who else "",
+            "входит": includes(page, plan),
+            "нет_в_тарифе": [],
+        })
+    return plans
+
+
+def riso_extras(block: str) -> list[str]:
+    """Надстройки и разовые работы: в ризографической вёрстке это плитки
+    бенто без помесячной цены — фотостудия, подключение, сводный кабинет."""
+    out = []
+    for cell in re.findall(r'<div class="cell[^"]*">(.*?)(?=<div class="cell|</div>\s*<p class="fine")', block, re.S):
+        if "data-month" in cell or "<h3>" not in cell:
+            continue
+        out.append(text(cell).strip())
+    return out
+
+
+def tariffs(page: str) -> dict:
+    block = section(page, 'id="pricing"', 'id="faq"')
+    plans = []
+    for card in re.findall(r'<div class="card">(.*?)</div>\s*</div>', block, re.S):
+        name = re.search(r"<h3>(.*?)</h3>", card, re.S)
+        price = re.search(r'data-month="([^"]*)"\s+data-year="([^"]*)"', card)
+        who = re.search(r'<div class="for">(.*?)</div>', card, re.S)
+        if not (name and price):
+            continue
+        plans.append({
+            "тариф": text(name.group(1)),
+            "в_месяц": text(price.group(1)),
+            "при_оплате_за_год": text(price.group(2)),
+            "кому": text(who.group(1)) if who else "",
+            **plan_items(card),
+        })
+    # У сайта два оформления (см. tools/theme.py), и тарифы в них свёрстаны
+    # по-разному. Знание о ценах одно, поэтому разбираем обе вёрстки: пустой
+    # список здесь означал бы, что ассистент вышел к клиенту без прайса.
+    if not plans:
+        plans = riso_cards(page, block)
+
+    # блоки под карточками: внедрение, платные надстройки, условия для сетей.
+    # Берём их поимённо, а не «хвостом после последней кнопки»: хвост ломался
+    # от любой перестановки блоков и молча терял то, что в них написано.
+    extras = [
+        text(e).strip()
+        for e in re.findall(r'<div class="extra">(.*?)</div>', block, re.S)
+    ]
+    if not extras:
+        extras = riso_extras(block)
+    fine = re.search(r'<p class="fine">(.*?)</p>', block, re.S)
+    return {
+        "тарифы": plans,
+        "дополнительно": extras,
+        "условия": text(fine.group(1)) if fine else "",
+    }
+
+
+def faq(page: str) -> list[dict]:
+    block = section(page, 'id="faq"', 'id="call"')
+    return [
+        {"вопрос": text(q), "ответ": text(a)}
+        for q, a in re.findall(r"<summary>(.*?)</summary>(.*?)</details>", block, re.S)
+    ]
+
+
+def contacts(page: str) -> dict:
+    """Каналы связи — из настоящих ссылок в блоке #call, а не вписанные
+    руками: иначе рано или поздно разъедутся, как это уже было с ценами."""
+    block = section(page, 'id="call"', "</footer>")
+    out = {}
+    phone = re.search(r'href="tel:([^"]+)"', block)
+    if phone:
+        out["телефон"] = phone.group(1)
+    whatsapp = re.search(r'href="(https://wa\.me/[^"]+)"', block)
+    if whatsapp:
+        out["whatsapp"] = whatsapp.group(1)
+    telegram = re.search(r'href="(https://t\.me/[^"]+)"', block)
+    if telegram:
+        out["telegram"] = telegram.group(1)
+    max_ = re.search(r'href="(https://max\.ru/[^"]+)"', block)
+    if max_:
+        out["max"] = max_.group(1)
+    return out
+
+
+def home_page() -> str:
+    url = os.getenv("KB_SITE_URL")
+    if not url:
+        return SITE.read_text(encoding="utf-8")
+    with urllib.request.urlopen(url, timeout=20) as r:
+        return r.read().decode("utf-8")
+
+
+def main() -> None:
+    page = home_page()
+    product = [
+        json.loads(f.read_text(encoding="utf-8"))
+        for f in sorted(PRODUCT.glob("[0-9]*.json"))
+    ]
+    kb = {
+        "собрано": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "контакты": contacts(page),
+        "продукт": product,
+        "политика": json.loads((PRODUCT / "policy.json").read_text(encoding="utf-8")),
+        **tariffs(page),
+        "частые_вопросы": faq(page),
+    }
+    OUT.write_text(json.dumps(kb, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    size = len(json.dumps(kb, ensure_ascii=False))
+    print(f"контакты: {kb['контакты'] or '(не найдены)'}")
+    print(f"тем о продукте: {len(product)}")
+    print(f"тарифов: {len(kb['тарифы'])} — " + ", ".join(
+        f"{p['тариф']} {p['в_месяц']}" for p in kb["тарифы"]))
+    print(f"вопросов: {len(kb['частые_вопросы'])}")
+    print(f"снапшот: {size} знаков (~{size // 3} токенов) → {OUT}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block og_extra %}<meta property="article:published_time" content="{{ article.published_iso }}">
+<meta property="article:modified_time" content="{{ article.modified_iso }}">
+{% endblock %}
+{% block main %}<main>
+  <div class="page-hero">
+    <div class="wrap">
+      <div class="crumbs"><a href="/">Падача</a> → <a href="/blog/">Статьи</a> → {{ article.crumb }}</div>
+      <h1>{{ article.heading|safe }}</h1>
+      <p class="lede">{{ article.lede }}</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="narrow prose">
+{{ article.body_html }}
+    </div>
+  </section>
+{% if questions %}
+  <section class="deep">
+    <div class="wrap">
+      <div class="head">
+        <div class="lbl">Вопросы</div>
+        <h2>{{ article.faq_title|default:"Частые вопросы" }}</h2>
+      </div>
+{% for q in questions %}      <details>
+        <summary>{{ q.question }}</summary>
+{{ q.answer_html }}
+      </details>
+{% endfor %}    </div>
+  </section>
+{% endif %}{% if related %}
+  <section>
+    <div class="wrap">
+      <div class="head">
+        <div class="lbl">Читать дальше</div>
+        <h2>Рядом по теме</h2>
+      </div>
+      <div class="more">
+{% for r in related %}        <a href="{{ r.href }}"><b>{{ r.title }}</b><span>{{ r.note }}</span></a>
+{% endfor %}      </div>
+    </div>
+  </section>
+{% endif %}
+<div class="call" id="call">
+    <div class="wrap">
+      <div class="lbl">Заказ принят</div>
+      <h2>{{ article.call_title|default:"Посмотрите, как это в работе" }}</h2>
+      <p>{{ article.call_text|default:"Демо открыто круглосуточно: зайдите под любой ролью и потрогайте систему руками — или позвоните, проведём по вашему меню." }}</p>
+      <div class="contacts">
+        <a class="btn" href="tel:+79943121222">Позвонить · +7 994 312-12-22</a>
+        <a class="btn ghost" href="https://wa.me/79289557566" target="_blank" rel="noreferrer">WhatsApp</a>
+        <a class="btn ghost" href="https://t.me/+79289557566" target="_blank" rel="noreferrer">Telegram</a>
+        <a class="btn ghost" href="https://demo.padacha.ru" target="_blank" rel="noreferrer">Открыть демо</a>
+      </div>
+{% include "partials/lead_form.html" %}
+    </div>
+  </div>
+</main>{% endblock %}

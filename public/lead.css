@@ -1,0 +1,32 @@
+/* Форма заявки в блоке #call — на главной и на внутренних страницах.
+   Только общие токены обеих вёрсток (--ink, --bg, --heat), поэтому
+   форма одинаково ложится и на page.css, и на riso-главную. */
+.lead { max-width: 640px; margin: 30px auto 0; text-align: left; }
+#top .lead { margin-left: 0; }  /* на главной блок выровнен влево */
+.lead-title { font-weight: 600; margin: 0 0 14px; }
+.lead-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lead-grid label { display: flex; flex-direction: column; gap: 6px; }
+.lead-grid label > span {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink);
+}
+.lead-wide { grid-column: 1 / -1; }
+.lead input, .lead select, .lead textarea {
+  font: inherit; font-size: 1rem; color: var(--ink);
+  background: var(--bg); border: 2px solid var(--ink); border-radius: 0;
+  padding: 11px 12px; width: 100%; box-sizing: border-box;
+}
+.lead textarea { resize: vertical; min-height: 64px; }
+.lead input:focus, .lead select:focus, .lead textarea:focus { outline: 3px solid var(--heat); outline-offset: 1px; }
+.lead-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; font-size: .9rem; cursor: pointer; }
+.lead-consent input { width: 18px; height: 18px; margin: 2px 0 0; padding: 0; flex: none; accent-color: var(--heat); }
+.lead-consent a { color: inherit; text-decoration: underline; }
+.lead.sent .lead-consent { display: none; }
+.lead-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.lead-foot { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+.lead-foot .btn { cursor: pointer; }
+.lead-foot .btn[disabled] { opacity: .6; cursor: wait; }
+.lead-msg { margin: 0; font-weight: 600; }
+.lead-msg.err { color: var(--heat); }
+.lead.sent .lead-grid, .lead.sent .lead-foot .btn, .lead.sent .lead-title { display: none; }
+@media (max-width: 640px) { .lead-grid { grid-template-columns: 1fr; } }

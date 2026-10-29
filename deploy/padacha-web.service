@@ -1,0 +1,30 @@
+# systemd-юнит сайта padacha.ru (Django). Ставится так:
+#   sudo cp padacha-web.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now padacha-web
+#
+# Пути — под /opt/padacha на сервере hackit: клон репозитория kmvit/padacha.
+# Обновление: git pull + restart (миграции и статика админки — сами, при старте).
+
+[Unit]
+Description=Сайт «Падачи» (padacha.ru)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/padacha
+Environment=PYTHONUNBUFFERED=1
+ExecStartPre=/opt/padacha/.venv/bin/python manage.py migrate --noinput
+ExecStartPre=/opt/padacha/.venv/bin/python manage.py collectstatic --noinput
+ExecStart=/opt/padacha/.venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:8120 --workers 3 --timeout 30
+Restart=always
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

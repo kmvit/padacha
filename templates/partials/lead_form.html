@@ -1,0 +1,21 @@
+      <form class="lead" action="/api/lead/" method="post" data-lead>
+        <p class="lead-title">Или оставьте телефон — перезвоним сами</p>
+        <div class="lead-grid">
+          <label><span>Имя</span><input name="name" required maxlength="120" autocomplete="name"></label>
+          <label><span>Телефон или Telegram</span><input name="phone" required maxlength="120" inputmode="tel" autocomplete="tel"></label>
+          <label><span>Формат</span><select name="venue">
+            <option value="">Пока не решили</option>
+            <option value="counter">Точка без зала</option>
+            <option value="hall">Кафе с залом</option>
+          </select></label>
+          <label class="lead-wide"><span>Комментарий</span><textarea name="comment" rows="2" maxlength="2000" placeholder="Сколько точек, когда хотите запуститься"></textarea></label>
+        </div>
+        <label class="lead-consent"><input type="checkbox" name="consent" value="1" required>
+          <span>Согласен на <a href="/soglasie/" target="_blank">обработку персональных данных</a></span></label>
+        <label class="lead-hp" aria-hidden="true">Сайт <input name="website" tabindex="-1" autocomplete="off"></label>
+        <input type="hidden" name="page" value="{{ meta.path }}">
+        <div class="lead-foot">
+          <button class="btn" type="submit">Жду звонка</button>
+          <p class="lead-msg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
