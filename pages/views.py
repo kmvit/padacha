@@ -7,7 +7,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_safe
 from django.views.static import serve
 
 from blog import markup
@@ -40,7 +40,7 @@ def visible(page: Page, request) -> bool:
     return page.is_published or request.user.is_staff
 
 
-@require_GET
+@require_safe
 def page_view(request, path: str = ""):
     page = Page.objects.filter(path=f"/{path}").first()
     if not page or not visible(page, request):
@@ -112,7 +112,7 @@ def article_jsonld(a: Article, questions) -> str:
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, indent=2)
 
 
-@require_GET
+@require_safe
 def article_view(request, slug: str):
     article = get_object_or_404(Article, slug=slug)
     if not article.is_live and not request.user.is_staff:
@@ -127,7 +127,7 @@ def article_view(request, slug: str):
     })
 
 
-@require_GET
+@require_safe
 def sitemap(request):
     pages = [(p.path, p.lastmod, p.changefreq, p.priority)
              for p in Page.objects.filter(is_published=True, in_sitemap=True, noindex=False)]
