@@ -1,7 +1,9 @@
 # Деплой padacha.ru на сервер hackit
 
-Сайт переезжает со старого сервера (там остаётся сервис: пульт, лицензии,
-клиенты) на Jino VPS hackit, рядом с hack-its.ru:
+Сайт переезжает со старого сервера на Jino VPS hackit, рядом с hack-its.ru.
+На старом сервере остаётся сервис: hub и поддомены заведений. Кафе,
+подписки, платежи и лицензии ведутся в hub (`hub.padacha.ru/admin/`), сайт
+к ним отношения не имеет.
 
 ```bash
 ssh -J vpn -p 49263 root@cf24caf415b6.vps.myjino.ru
@@ -18,36 +20,7 @@ TLS снимает прокси Jino (195.161.41.70), nginx на VPS слуша�
 так же, как у hack-its.ru. Админка: `https://padacha.ru/upravlenie/`
 (`ADMIN_PATH` в `.env`), разделы **Заявки**, **Страницы**, **Статьи**.
 
-Пульт и `/api/license/` остаются на старом сервере. nginx проксирует эти
-адреса туда по имени `pult.padacha.ru`, поэтому инстансы заведений менять
-не нужно (шаг 1).
-
-## 1. Старый сервер: отдельное имя для пульта
-
-Оба сервера — VPS Jino, и `padacha.ru` (как и любой `*.padacha.ru`)
-уже смотрит на прокси Jino 195.161.41.70. Куда прокси отправит домен,
-решает привязка в панели Jino, а не A-запись. Пока `pult.padacha.ru`
-никуда не привязан, прокси отвечает на него 400.
-
-1. В панели Jino привязать `pult.padacha.ru` к старому VPS
-   (`a318f7177847.vps.myjino.ru`) и выпустить для него сертификат.
-2. На старом сервере — server-блок `server_name pult.padacha.ru;` с теми же
-   локациями `/pult/`, `/api/license/`, `/pult-static/`, что сейчас в
-   `/etc/nginx/sites-available/padacha`, затем:
-
-   ```bash
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
-
-   (если старый VPS сам держит сертификаты через certbot, как для
-   padacha.ru, — ещё `sudo certbot --nginx -d pult.padacha.ru`)
-
-3. В `/opt/padacha/pult/.env` дописать `pult.padacha.ru` в
-   `DJANGO_ALLOWED_HOSTS`, перезапустить `padacha-pult`.
-4. Проверить: `curl -X POST https://pult.padacha.ru/api/license/ -d '{"key":"x"}'`
-   отвечает 404 «Ключ не найден».
-
-## 2. hackit: код и окружение
+## 1. hackit: код и окружение
 
 ```bash
 git clone https://github.com/kmvit/padacha.git /opt/padacha
@@ -58,7 +31,7 @@ cp .env.example .env
 python3 -c "import secrets; print(secrets.token_urlsafe(50))"   # → DJANGO_SECRET_KEY в .env
 ```
 
-## 3. База: перенос страниц и статей
+## 2. База: перенос страниц и статей
 
 Страницы берутся из `legacy/` (снимок статического сайта), статьи — из
 `content/blog/*.md`:
@@ -80,7 +53,7 @@ chown -R www-data:www-data var staticfiles .env && chmod 640 .env
 
 Отложенные статьи получают время выхода и появятся на сайте сами.
 
-## 4. Сервисы
+## 3. Сервисы
 
 ```bash
 cd /opt/padacha
@@ -104,11 +77,9 @@ systemctl enable --now padacha-assistant
 Цены и FAQ ассистент берёт с главной у самого сайта (`KB_SITE_URL` в юните).
 Поменяли цены в админке — `systemctl restart padacha-assistant`.
 
-## 5. nginx
+## 4. nginx
 
-Конфиг рассчитан на соседство с hack-its.ru: свой `server_name`, только
-:80, адрес пульта ищется при запросе (без записи `pult.padacha.ru` nginx
-всё равно стартует).
+Конфиг рассчитан на соседство с hack-its.ru: свой `server_name`, только :80.
 
 ```bash
 cp /opt/padacha/deploy/nginx-padacha.conf /etc/nginx/sites-available/padacha
@@ -126,26 +97,30 @@ curl -s  -H 'Host: padacha.ru' http://127.0.0.1/api/assistant/health
 curl -sI -H 'Host: hack-its.ru' http://127.0.0.1/             # соседа не задели
 ```
 
-## 6. Переключение
+## 5. Переключение
 
-1. Убедиться, что шаг 1 сделан: `https://pult.padacha.ru/api/license/`
-   отвечает, иначе после переключения инстансы заведений потеряют лицензии.
-2. Проверить сертификат для `padacha.ru` и `www.padacha.ru` в панели Jino
+1. Проверить сертификат для `padacha.ru` и `www.padacha.ru` в панели Jino
    (для привязки к hackit он нужен на прокси, как у hack-its.ru).
-3. Если после 29.10 что-то правили в `padacha-landing`, перенести сюда:
+2. Если после 29.10 что-то правили в `padacha-landing`, перенести сюда:
    новые статьи `content/blog/*.md` → `content/blog/` и `import_articles`;
    правки страниц → `legacy/` и `import_pages --force` (перезапишет правки,
    сделанные в админке).
-4. В Яндекс Метрике (счётчик 112273830) добавить цель «JavaScript-событие»
+3. В Яндекс Метрике (счётчик 112273830) добавить цель «JavaScript-событие»
    `lead_form` — её шлёт форма заявки после отправки. Цели кликов
    (`click_connect`, `click_phone`, `click_messenger`, `click_demo`) прежние.
-5. В панели Jino перепривязать `padacha.ru` и `www.padacha.ru` со старого
+4. В панели Jino перепривязать `padacha.ru` и `www.padacha.ru` со старого
    VPS на hackit (`cf24caf415b6.vps.myjino.ru`). DNS менять не нужно —
    домен уже смотрит на прокси Jino; откат — привязать обратно.
-6. Проверить: главная, статья, отправка заявки (появляется в админке),
-   `https://padacha.ru/pult/` открывает вход в пульт, ассистент отвечает.
-7. На старом сервере выключить cron `tools/publish.sh` и отдачу сайта —
-   там остаётся только пульт.
+5. Проверить: главная, статья, отправка заявки (появляется в админке),
+   ассистент отвечает; hub и поддомены заведений работают как раньше.
+6. На старом сервере выключить cron `tools/publish.sh` и отдачу сайта
+   из конфига nginx `padacha` (старый пульт `/pult/` уехал в hub и больше не
+   нужен; сервис `padacha-pult` можно выключить). Поддомены — в `padacha-app`,
+   их не трогать.
+7. Сертификат `padacha.ru` на старом сервере общий: `padacha.ru`, `www`,
+   `demo`, `hub`, `monti` (до 11.12.2026). После переезда certbot не продлит
+   его из-за `padacha.ru` и `www` — перевыпустить без них:
+   `certbot --nginx --cert-name padacha.ru -d demo.padacha.ru -d hub.padacha.ru -d monti.padacha.ru`.
 
 ## Обновление
 
