@@ -226,6 +226,15 @@
     var sessionId = null;
     var starting = null;
 
+    // Цели Метрики: открыл ассистента и задал первый вопрос. Каждая — раз
+    // за просмотр страницы, повторные открытия и вопросы счёт не раздувают.
+    var reached = {};
+    function goal(name) {
+      if (reached[name] || typeof ym !== "function") return;
+      reached[name] = true;
+      ym(112273830, "reachGoal", name);
+    }
+
     function escapeHtml(s) {
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
@@ -279,6 +288,7 @@
     }
 
     btn.addEventListener("click", function () {
+      goal("assistant_open");
       panel.hidden = false;
       btn.hidden = true;
       ensureSession().then(function () { input.focus(); });
@@ -292,6 +302,7 @@
       e.preventDefault();
       var text = input.value.trim();
       if (!text) return;
+      goal("assistant_question");
       input.value = "";
       send.disabled = true;
       bubble("me", text);
