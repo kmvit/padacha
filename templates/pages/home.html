@@ -104,6 +104,29 @@
     });
   }
 
+  /* ── Карусель первого экрана: листается сама, пока её не трогают ───── */
+  var hp = document.getElementById("hpTrack");
+  if (hp) {
+    var hpDots = [].slice.call(document.querySelectorAll(".hp-dots button"));
+    var hpAt = 0, hpTimer = null;
+    var hpGo = function (i) { hp.scrollTo({ left: i * hp.clientWidth, behavior: reduce ? "auto" : "smooth" }); };
+    var hpStop = function () { clearInterval(hpTimer); hpTimer = null; };
+    hpDots.forEach(function (d, i) { d.addEventListener("click", function () { hpStop(); hpGo(i); }); });
+    hp.addEventListener("scroll", function () {
+      var i = Math.round(hp.scrollLeft / hp.clientWidth);
+      if (i === hpAt) return;
+      hpAt = i;
+      hpDots.forEach(function (d, k) { if (k === i) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current"); });
+    }, { passive: true });
+    if (!reduce) {
+      var hpHover = false, hpPic = document.getElementById("heroPic");
+      hpTimer = setInterval(function () { if (!document.hidden && !hpHover) hpGo((hpAt + 1) % hpDots.length); }, 5000);
+      ["pointerdown", "wheel", "keydown"].forEach(function (ev) { hp.addEventListener(ev, hpStop, { passive: true }); });
+      hpPic.addEventListener("mouseenter", function () { hpHover = true; });
+      hpPic.addEventListener("mouseleave", function () { hpHover = false; });
+    }
+  }
+
   /* ── Бегущая строка: быстрее при прокрутке ─────────────────────────── */
   var track = document.getElementById("mtrack");
   if (track && !reduce) {
