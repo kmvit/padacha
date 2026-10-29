@@ -18,6 +18,19 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 
+def _digits(value: str) -> str:
+    """Номер из tel:/wa.me/t.me-ссылки в виде +7XXXXXXXXXX ('' — если не номер)."""
+    digits = "".join(ch for ch in value if ch.isdigit())
+    if len(digits) == 11 and digits[0] in "78":
+        return "+7" + digits[1:]
+    return ""
+
+
+def _pretty(phone: str) -> str:
+    """+79943121222 → +7 994 312-12-22."""
+    return f"+7 {phone[2:5]} {phone[5:8]}-{phone[8:10]}-{phone[10:12]}"
+
+
 class KnowledgeBase:
     def __init__(self, path: Path) -> None:
         self._path = path
@@ -52,21 +65,27 @@ class KnowledgeBase:
     def contact_line(self) -> str:
         """Одной строкой, для сообщений об ошибках и лимитах.
 
-        Телефон читаемым видом — та же цифровая строка неудобна для устной
-        диктовки в чате. WhatsApp и Telegram у этого номера настоящие ссылки,
-        а не выдумка «можно и туда».
+        Номера читаемым видом — цифровая строка неудобна для устной диктовки
+        в чате. Звонок и мессенджеры у «Падачи» на разных номерах: номер
+        WhatsApp и Telegram берётся из самих ссылок wa.me / t.me на сайте,
+        а не приписывается телефону для звонков.
         """
         c = self.contacts
-        phone = c.get("телефон", "")
-        if not phone:
-            return "команде"
-        pretty = phone
-        if phone.startswith("+7") and len(phone) == 12:
-            pretty = f"+7 {phone[2:5]} {phone[5:8]}-{phone[8:10]}-{phone[10:12]}"
-        line = f"{pretty} — звонок, WhatsApp или Telegram"
+        phone = _digits(c.get("телефон", ""))
+        messenger = _digits(c.get("whatsapp", "")) or _digits(c.get("telegram", ""))
+        apps = " и ".join(n for k, n in (("whatsapp", "WhatsApp"), ("telegram", "Telegram")) if c.get(k))
+
+        parts = []
+        if phone and messenger == phone and apps:
+            parts.append(f"{_pretty(phone)} — звонок, {apps.replace(' и ', ' или ')}")
+        else:
+            if phone:
+                parts.append(f"{_pretty(phone)} — звонок")
+            if messenger and apps:
+                parts.append(f"{_pretty(messenger)} — {apps}")
         if c.get("почта"):
-            line += f", или письмо на {c['почта']}"
-        return line
+            parts.append(f"{c['почта']} — почта")
+        return "; ".join(parts) or "команде"
 
     @property
     def tariffs(self) -> list[dict]:
