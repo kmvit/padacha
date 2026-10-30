@@ -112,6 +112,11 @@
     var hpGo = function (i) { hp.scrollTo({ left: i * hp.clientWidth, behavior: reduce ? "auto" : "smooth" }); };
     var hpStop = function () { clearInterval(hpTimer); hpTimer = null; };
     hpDots.forEach(function (d, i) { d.addEventListener("click", function () { hpStop(); hpGo(i); }); });
+    var hpPrev = document.getElementById("hpPrev"), hpNext = document.getElementById("hpNext");
+    if (hpPrev && hpNext) {
+      hpPrev.addEventListener("click", function () { hpStop(); hpGo((hpAt - 1 + hpDots.length) % hpDots.length); });
+      hpNext.addEventListener("click", function () { hpStop(); hpGo((hpAt + 1) % hpDots.length); });
+    }
     hp.addEventListener("scroll", function () {
       var i = Math.round(hp.scrollLeft / hp.clientWidth);
       if (i === hpAt) return;
