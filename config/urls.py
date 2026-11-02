@@ -10,7 +10,7 @@ from pages import views
 
 admin.site.site_header = "Падача — сайт"
 admin.site.site_title = "Падача — сайт"
-admin.site.index_title = "Заявки, страницы и статьи"
+admin.site.index_title = "Заявки, диалоги, страницы и статьи"
 
 urlpatterns = [
     path(settings.ADMIN_PATH, admin.site.urls),

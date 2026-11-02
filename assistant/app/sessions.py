@@ -64,6 +64,9 @@ class SessionStore:
             session.touch()
         return session
 
+    def discard(self, session_id: str) -> None:
+        self._sessions.pop(session_id, None)
+
     @property
     def active(self) -> int:
         return len(self._sessions)

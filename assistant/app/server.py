@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 
 from fastapi import FastAPI, Header, Request
@@ -19,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from app.agent import GREETING, build_sdk
 from app.config import settings
+from app.dialogs import check_schema, create_conversation, save_exchange
 from app.kb import kb
 from app.limits import DailyBudget, IpLimiter, canned_reply
 from app.sessions import SessionStore, TooManySessions
@@ -50,6 +52,7 @@ limiter = IpLimiter(
 @app.on_event("startup")
 async def startup() -> None:
     settings.require_credentials()
+    await asyncio.to_thread(check_schema)
     build_sdk()
     # Модель — в лог первой строкой: незамеченный откат на дорогую модель
     # обнаруживается по счёту, а не по поведению, отвечает-то она хорошо.
@@ -149,7 +152,22 @@ async def start(request: Request) -> JSONResponse:
             {"error": "too_many_sessions", "message": "Слишком много открытых диалогов с этого адреса."},
             status_code=429,
         )
+    try:
+        await asyncio.to_thread(create_conversation, session.id, GREETING)
+    except Exception:
+        store.discard(session.id)
+        logger.exception("Не удалось сохранить новый диалог")
+        return JSONResponse({"error": "storage_unavailable"}, status_code=503)
     return JSONResponse({"session_id": session.id, "greeting": GREETING})
+
+
+async def recorded_reply(session_id: str, question: str, answer: str) -> JSONResponse:
+    try:
+        await asyncio.to_thread(save_exchange, session_id, question, answer)
+    except Exception:
+        logger.exception("Не удалось сохранить реплики диалога")
+        return JSONResponse({"error": "storage_unavailable"}, status_code=503)
+    return JSONResponse({"reply": answer})
 
 
 @app.post("/api/chat")
@@ -169,32 +187,28 @@ async def chat(payload: ChatRequest, request: Request) -> JSONResponse:
     # 1. Темп — бережёт сервер, проверяется для любой реплики первым.
     reason = limiter.check_rate(ip)
     if reason:
-        return JSONResponse({"reply": _limit_reply(reason)})
+        return await recorded_reply(session.id, text, _limit_reply(reason))
     limiter.record_rate(ip)
 
     # 2. Пустое, повтор, набор символов — заготовка, модель не трогаем.
     canned = canned_reply(text, session.last_user_text)
     if canned:
         session.last_user_text = text
-        return JSONResponse({"reply": canned})
+        return await recorded_reply(session.id, text, canned)
 
     if session.messages >= settings.max_messages_per_session:
         contact = kb.contact_line
-        return JSONResponse(
-            {"reply": f"Мы с вами долго общаемся — дальше полезнее написать напрямую: {contact}."}
-        )
+        return await recorded_reply(session.id, text, f"Мы с вами долго общаемся — дальше полезнее написать напрямую: {contact}.")
 
     # 3. Предохранитель: суточный потолок на весь сервис исчерпан.
     if budget.exhausted:
         contact = kb.contact_line
-        return JSONResponse(
-            {"reply": f"На сегодня лимит вопросов исчерпан. Напишите напрямую: {contact}."}
-        )
+        return await recorded_reply(session.id, text, f"На сегодня лимит вопросов исчерпан. Напишите напрямую: {contact}.")
 
     # 4. Платная реплика — вот теперь дневная квота на адрес.
     reason = limiter.check_quota(ip)
     if reason:
-        return JSONResponse({"reply": _limit_reply(reason)})
+        return await recorded_reply(session.id, text, _limit_reply(reason))
 
     limiter.record_quota(ip)
     session.messages += 1
@@ -205,7 +219,7 @@ async def chat(payload: ChatRequest, request: Request) -> JSONResponse:
         answer = await session.agent.ask(text)
     except Exception:  # noqa: BLE001 — посетителю нужен ответ, а не 500
         logger.exception("Сбой при обработке реплики")
-        return JSONResponse({"reply": f"Технический сбой. Напишите напрямую: {contact}."})
+        return await recorded_reply(session.id, text, f"Технический сбой. Напишите напрямую: {contact}.")
 
     budget.record()
 
@@ -216,7 +230,7 @@ async def chat(payload: ChatRequest, request: Request) -> JSONResponse:
         "сессия=%s адрес=%s реплик=%d осталось_адресу=%d",
         session.id[:8], ip, session.messages, limiter.left_today(ip),
     )
-    return JSONResponse({"reply": answer})
+    return await recorded_reply(session.id, text, answer)
 
 
 def main() -> None:

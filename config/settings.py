@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "leads",
     "pages",
     "blog",
+    "assistant_dialogs",
 ]
 SITE_ID = 1
 

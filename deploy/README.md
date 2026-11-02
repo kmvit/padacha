@@ -18,7 +18,7 @@ ssh -J vpn -p 49263 root@cf24caf415b6.vps.myjino.ru
 
 TLS снимает прокси Jino (195.161.41.70), nginx на VPS слушает только :80 —
 так же, как у hack-its.ru. Админка: `https://padacha.ru/upravlenie/`
-(`ADMIN_PATH` в `.env`), разделы **Заявки**, **Страницы**, **Статьи**.
+(`ADMIN_PATH` в `.env`), разделы **Заявки**, **Диалоги**, **Страницы**, **Статьи**.
 
 ## 1. hackit: код и окружение
 
