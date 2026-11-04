@@ -90,26 +90,7 @@ h2 { font-size: clamp(36px, 4vw, 54px); }
 h3 { font-size: 32px; }
 .feature > p { margin: 22px 0 32px; font-size: 13px; color: #62695b; line-height: 1.8; }
 .feature-guest { background: #e0e8cf; }
-.guest-menu { margin-top: auto; padding: 14px 16px 10px; background: #171b18; color: #f2f4e9; border: 1px solid #3b4538; }
-.guest-menu-top { display: flex; justify-content: space-between; gap: 12px; color: #b1bea4; font: 11px 'IBM Plex Mono', monospace; }
-.guest-menu-top span:last-child { color: #cff76b; }
-.guest-menu-heading { font-size: 20px; font-weight: 700; margin: 14px 0 11px; }
-.guest-menu-categories { display: flex; gap: 6px; margin-bottom: 10px; }
-.guest-menu-categories span { padding: 5px 10px; border: 1px solid #64705e; border-radius: 20px; color: #e0e6d6; font-size: 12px; }
-.guest-menu-categories .active { color: #171b18; background: #d0f775; border-color: #d0f775; }
-.guest-menu-item { display: flex; align-items: center; gap: 8px; border-top: 1px solid #3b4538; padding: 9px 0; font-size: 14px; }
-.guest-menu-item > span { flex: 1; font-weight: 600; }
-.guest-menu-item small { display: block; color: #b1bea4; font-size: 11px; font-weight: 400; }
-.guest-menu-item b { white-space: nowrap; color: #d0f775; font-size: 13px; }
-.guest-menu-item i { display: grid; place-items: center; width: 23px; height: 23px; background: #d0f775; color: #171b18; font-size: 18px; font-style: normal; line-height: 1; }
-.station-map { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 9px; margin: auto 0 10px; }
-.station-map span { display: inline-block; border: 1px solid #a3b28b; padding: 10px 20px; background: #e5e9dc; }
-.station-map i { display: block; font-style: normal; font-size: 20px; line-height: 1.7; color: #6c7958; }
-.station-map > div { display: flex; justify-content: center; gap: 16px; }
-.station-map .ready { background: #d0f775; border-color: #92b44c; }
-.owner-list { margin: auto 0 0; font-size: 12px; }
-.owner-list > span { display: flex; justify-content: space-between; padding: 17px 0; border-top: 1px solid #bfc7b4; }
-.owner-list b { font-weight: 400; }
+.feature-visual { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; margin-top: auto; border: 1px solid #aab79f; }
 .format-strip { display: flex; justify-content: space-between; gap: 24px; align-items: center; padding: 30px 0; }
 .format-strip > span { color: #62695b; font-size: 9px; }
 .format-strip a { font-size: 12px; padding: 8px 0; }
@@ -208,8 +189,7 @@ h3 { font-size: 32px; }
   .feature-top { grid-column: 1 / -1; margin: 0 0 6px; }
   .feature h3 { font-size: 32px; }
   .feature > p { grid-column: 1; margin: 0; }
-  .guest-menu, .station-map, .owner-list { grid-column: 2; grid-row: 2 / 4; align-self: center; margin: 0; }
-  .station-map span { padding: 9px 12px; }
+  .feature-visual { grid-column: 2; grid-row: 2 / 4; align-self: center; margin: 0; }
   .format-strip { flex-wrap: wrap; gap: 14px 25px; }
   .format-strip > span { width: 100%; }
   .pricing { padding-top: 60px; padding-bottom: 60px; }
@@ -258,9 +238,7 @@ h3 { font-size: 32px; }
   .feature-top { margin-bottom: 24px; }
   .feature h3 { font-size: 36px; }
   .feature > p { margin-top: 20px; margin-bottom: 24px; }
-  .guest-menu { margin-top: 0; }
-  .station-map { padding: 15px 0; }
-  .owner-list { margin-top: 32px; }
+  .feature-visual { margin-top: 0; }
   .format-strip { padding: 24px 0; gap: 10px 20px; }
   .format-strip a { font-size: 11px; }
   .pricing-title h2 { font-size: 36px; }
@@ -313,7 +291,7 @@ h3 { font-size: 32px; }
 .backoffice-grid .mono { color: var(--accent); }
 .backoffice-grid h3 { margin: 30px 0 17px; font-size: 29px; }
 .backoffice-grid p { font-size: 13px; color: #b4beac; line-height: 1.8; max-width: 430px; }
-.backoffice-grid img { width: 100%; height: 225px; object-fit: cover; object-position: top left; margin: 30px 0 20px; border: 5px solid #10120f; }
+.backoffice-grid img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; margin: 30px 0 20px; border: 1px solid #53604d; }
 .backoffice-grid a { align-self: flex-start; font-size: 12px; border-bottom: 1px solid var(--accent); padding: 5px 0; }
 .launch { display: grid; grid-template-columns: 1.2fr 1fr; gap: 65px; padding-top: 80px; padding-bottom: 80px; border-top: 1px solid var(--line); }
 .launch .eyebrow, .faq .eyebrow { color: var(--accent); margin-bottom: 28px; }
@@ -340,7 +318,6 @@ h3 { font-size: 32px; }
   .flow-steps > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .flow-steps > div { min-height: 190px; }
   .video-feature { gap: 25px; padding: 25px; }
-  .backoffice-grid img { height: 180px; }
   .launch, .faq { gap: 35px; }
 }
 @media (max-width: 480px) {
@@ -352,14 +329,13 @@ h3 { font-size: 32px; }
   .video-feature, .backoffice-grid, .launch, .faq { grid-template-columns: 1fr; }
   .video-feature h3 { font-size: 29px; }
   .backoffice-grid h3 { font-size: 26px; }
-  .backoffice-grid img { height: 190px; }
   .launch { padding-top: 55px; padding-bottom: 55px; }
   .faq { padding-top: 15px; padding-bottom: 55px; }
 }
 /* Размеры текста в выбранной концепции: обычные пояснения читаются без увеличения. */
 :root { font-size:16px; }
 .eyebrow, .mono, .concept-bar, .preview-top, .screen-top, .step-number, .hero-bottom, .plan-heading .mono, .feature-top .mono, .format-strip > span { font-size:12px; }
-.hero-price, .workflow-step > span:nth-child(2) > span, .preview-demo, .feature > p, .station-map, .owner-list, .format-strip a, .pricing-title > p, .plan > p, .amount > span, .plan ul, .pricing-note, .telegram, .contact .lead-grid label > span, .contact .lead-consent, .footer-bottom, .dayflow-title > p:last-child, .backoffice-heading > p:last-child, .flow-steps p, .video-feature p:last-child, .backoffice-grid p, .backoffice-grid a, .launch > div:first-child > p:not(.eyebrow), .launch-facts p, .faq-list details p { font-size:15px; }
+.hero-price, .workflow-step > span:nth-child(2) > span, .preview-demo, .feature > p, .format-strip a, .pricing-title > p, .plan > p, .amount > span, .plan ul, .pricing-note, .telegram, .contact .lead-grid label > span, .contact .lead-consent, .footer-bottom, .dayflow-title > p:last-child, .backoffice-heading > p:last-child, .flow-steps p, .video-feature p:last-child, .backoffice-grid p, .backoffice-grid a, .launch > div:first-child > p:not(.eyebrow), .launch-facts p, .faq-list details p { font-size:15px; }
 .header nav, .nav-cta, .footer-top > a:last-child { font-size:15px; }
 .workflow-step b { font-size:19px; }
 .screen-top { line-height:1.5; }
