@@ -48,6 +48,22 @@ def page_view(request, path: str = ""):
     if page.path == "/blog/":
         return blog_index(request, page)
     meta = page_meta(page)
+    # Локальные альтернативы доступны только в режиме разработки.
+    if page.path == "/":
+        choice = request.GET.get("design") if settings.DEBUG else None
+        if choice != "current":
+            designs = {
+                "calm": "pages/home_calm.html",
+                "journal": "pages/home_journal.html",
+            }
+            template = designs.get(choice, "pages/home_shift.html")
+            preview = settings.DEBUG
+            return render(request, template, {
+                "page": page,
+                "meta": {**meta, "theme_color": "#151715", "noindex": preview,
+                         "jsonld": "" if preview else meta["jsonld"]},
+                "preview": preview,
+            })
     template = "pages/home.html" if page.layout == Page.Layout.HOME else "pages/page.html"
     return render(request, template, {"page": page, "meta": meta, "body": fill(page, request, meta)})
 

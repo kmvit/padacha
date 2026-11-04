@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;450;500;550;600;650;700;750;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/home-calm.css">
+{% endblock %}
+{% block body %}
+<a class="skip" href="#main">К содержимому</a>
+<div class="concept-bar">Новый взгляд на Падачу <span>Концепция 01 · Тёплый минимализм</span><a href="/?design=shift">Вариант 02 ↗</a><a href="/?design=journal">Вариант 03 ↗</a><a href="/?design=current">Прежний дизайн ↗</a></div>
+<header class="header wrap">
+  <a class="wordmark" href="/?design=calm" aria-label="Падача — главная"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M5 26V10h7v16m6 0V10h7v16M3 30h26M29 6h4"/></svg>падача<span>®</span></a>
+  <nav aria-label="Главное меню"><a href="#features">Возможности</a><a href="#formats">Для кого</a><a href="#pricing">Тарифы</a><a href="/blog/">Журнал</a></nav>
+  <a class="header-demo" href="https://demo.padacha.ru" target="_blank" rel="noreferrer">Открыть демо ↗</a>
+  <a class="button small" href="#call">Обсудить запуск <span>↗</span></a>
+</header>
+<main id="main">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="live-dot"></span> СИСТЕМА УПРАВЛЕНИЯ КАФЕ</p>
+      <h1>Всё по делу.<br>Всё <span>в Падаче.</span></h1>
+      <p class="intro">Гости, заказы, кухня и цифры — в одной системе. Чтобы у вас оставалось время на то, ради чего вы открыли своё кафе.</p>
+      <div class="hero-actions"><a class="button" href="#call">Давайте знакомиться <span>↗</span></a><a class="text-link" href="#features">Посмотреть, как устроено <span>↓</span></a></div>
+      <p class="hero-note">От 3 990 ₽ в месяц за заведение <i></i> Без доплат за экраны</p>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-top"><span><span class="live-dot"></span> У каждого — свой экран</span><span>01 / 03</span></div>
+      <div class="product-window"><div class="window-bar"><span class="window-dots">● ● ●</span><span>Падача / Рабочее место</span><span>↗</span></div><img id="hero-screen" src="/compose-waiter.webp" width="2000" height="1288" alt="Интерфейс официанта: заказ для стола 5 и разделение счёта по гостям" fetchpriority="high"></div>
+      <div class="visual-bottom"><div><span class="screen-label">СЕЙЧАС НА ЭКРАНЕ</span><b id="screen-name">Официант. Всё под рукой.</b></div><div class="screen-controls" aria-label="Выбрать экран продукта"><button type="button" aria-label="Экран официанта" aria-pressed="true" data-screen="0">01</button><button type="button" aria-label="Экран кухни" aria-pressed="false" data-screen="1">02</button><button type="button" aria-label="Экран склада" aria-pressed="false" data-screen="2">03</button></div></div>
+      <div class="visual-caption"><span class="caption-line"></span> Меньше суеты. Больше гостеприимства.</div>
+    </div>
+  </section>
+  <div class="benefit-strip wrap"><span>Один сервис. Вся смена.</span><p>QR-меню <i>·</i> Заказы и оплата <i>·</i> Кухня и бар <i>·</i> Склад <i>·</i> Команда</p><span class="strip-arrow" aria-hidden="true">↙</span></div>
+  <section class="section wrap" id="features">
+    <div class="section-heading"><div><p class="eyebrow">01 / ВОЗМОЖНОСТИ</p><h2>От первого заказа<br>до закрытия смены.</h2></div><p>Все части вашего заведения работают вместе. Без пересылки заказов и цифр из одной программы в другую.</p></div>
+    <div class="feature-grid">
+      <a class="feature feature-menu" href="/qr-menu/"><div class="feature-title"><span class="feature-number">01</span><span>↗</span></div><h3>Гость заказывает.<br>Вы встречаете.</h3><p>Меню, заказ и оплата — в телефоне гостя. По QR, без установки приложения.</p><div class="menu-preview" aria-hidden="true"><div class="menu-preview-head">Хорошее утро <span>Меню / Завтраки</span></div><img src="/photo-breakfast.webp" width="420" height="280" alt="" loading="lazy"><div class="dish-row"><b>Завтрак без спешки</b><span>+</span></div></div></a>
+      <a class="feature feature-kitchen" href="/ekran-kuhni/"><div class="feature-title"><span class="feature-number">02</span><span>↗</span></div><h3>На кухне порядок.<br>В зале спокойно.</h3><p>Кухня и бар видят свои заказы, время приготовления и что уже пора подавать.</p><img class="feature-screenshot" src="/kitchen.webp" width="2000" height="1288" alt="Очередь заказов на экране кухни Падачи" loading="lazy"></a>
+      <a class="feature feature-stock" href="/sklad/"><div class="feature-title"><span class="feature-number">03</span><span>↗</span></div><h3>Цифры понятны.<br>Решения — тоже.</h3><p>Остатки, техкарты и себестоимость. Вы знаете, что есть на складе и сколько стоит блюдо.</p><img class="feature-screenshot" src="/stock.webp" width="2000" height="1250" alt="Склад и остатки продуктов в Падаче" loading="lazy"></a>
+    </div>
+    <a class="text-link extra-link" href="/personal/">А ещё — смены, команда и зарплата <span>↗</span></a>
+  </section>
+  <section class="formats" id="formats"><div class="wrap formats-inner"><div class="formats-photo"><img src="/photo-cappuccino.webp" alt="Капучино с молочной пеной" width="600" height="600" loading="lazy"><span>Для тех, кто любит своё дело.</span></div><div class="formats-copy"><p class="eyebrow">02 / ВАШ ФОРМАТ</p><h2>Маленькая кофейня.<br>Большие планы.</h2><p>Окно с кофе навынос или кафе с полной посадкой — Падача подстраивается под вашу работу.</p><a class="format-row" href="/dlya-kofejni/"><div><b>Точка без зала</b><span>Кофейня, пекарня, фудтрак, островок</span></div><span>↗</span></a><a class="format-row" href="/dlya-kafe/"><div><b>Кафе с залом</b><span>Кафе, бистро, бар, ресторан</span></div><span>↗</span></a></div></div></section>
+  <section class="section wrap" id="pricing"><div class="section-heading"><div><p class="eyebrow">03 / ТАРИФЫ</p><h2>Одна цена.<br>Всё необходимое.</h2></div><p>Платите за заведение. Подключайте столько экранов, сколько нужно вашей команде.</p></div><div class="pricing-grid"><article class="price-card"><div class="price-heading"><h3>Стойка</h3><span>БЕЗ ЗАЛА</span></div><p>Для тех, кто выдаёт заказы по номеру.</p><div class="amount">3 990 <span>₽ / месяц</span></div><ul><li>QR-меню, заказы и оплата</li><li>Экран стойки и выдача по номеру</li><li>Склад, техкарты и себестоимость</li><li>Смены, зарплата и финансы</li></ul><a class="button secondary" href="#call">Обсудить подключение <span>↗</span></a></article><article class="price-card price-hall"><div class="price-heading"><h3>Зал</h3><span>С ПОСАДКОЙ</span></div><p>Для тех, кто встречает гостей за столом.</p><div class="amount">5 990 <span>₽ / месяц</span></div><ul><li>Весь учёт тарифа «Стойка»</li><li>Столы и рабочее место официанта</li><li>Отдельные экраны кухни и бара</li><li>Очереди и тайминги станций</li></ul><a class="button" href="#call">Обсудить подключение <span>↗</span></a></article></div><p class="pricing-note">Стоимость за одно заведение при помесячной оплате. <a href="/sravnenie/">Сравнить возможности ↗</a></p></section>
+  <section class="contact" id="call"><div class="wrap contact-grid"><div><p class="eyebrow">ДАВАЙТЕ ЗНАКОМИТЬСЯ</p><h2>У вас — своё дело.<br>У нас — Падача.</h2><p>Расскажите о вашем заведении. Покажем сервис и вместе разберёмся, с чего начать.</p><a class="contact-phone" href="tel:+79943121222">+7 994 312-12-22 ↗</a><a class="text-link" href="https://t.me/+79289557566" target="_blank" rel="noreferrer">Написать в Telegram ↗</a></div><div>{% include "partials/lead_form.html" %}</div></div></section>
+</main>
+<footer class="wrap footer"><a class="wordmark" href="/?design=calm">падача<span>®</span></a><p>Система управления кафе.<br>С вниманием к вашему делу.</p><div>© {% now "Y" %} {{ COMPANY.name }} · ИНН {{ COMPANY.inn }}<br><a href="mailto:{{ COMPANY.email }}">{{ COMPANY.email }}</a> · <a href="/soglasie/">Персональные данные</a></div></footer>
+<script src="/home-calm.js" defer></script>
+{% endblock %}
