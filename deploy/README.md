@@ -63,13 +63,12 @@ systemctl daemon-reload
 systemctl enable --now padacha-web padacha-indexnow.timer
 ```
 
-Ассистент: venv и `.env` с ключами Yandex Cloud (перенести со старого
-сервера, `/opt/padacha/assistant/.env`):
+Ассистент: venv и `.env` с отдельным ключом клиента MODO:
 
 ```bash
 cd /opt/padacha/assistant
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-cp .env.example .env    # вписать YC_FOLDER_ID, YC_API_KEY, RELOAD_TOKEN
+cp .env.example .env    # вписать MODO_API_KEY, RELOAD_TOKEN
 chown -R www-data:www-data data
 systemctl enable --now padacha-assistant
 ```

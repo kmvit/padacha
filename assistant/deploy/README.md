@@ -10,7 +10,7 @@
 cd /opt/padacha/assistant
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-cp .env.example .env        # заполнить YC_FOLDER_ID, YC_API_KEY, RELOAD_TOKEN
+cp .env.example .env        # заполнить MODO_API_KEY, RELOAD_TOKEN
 python -m scripts.export_kb # первый снапшот, дальше собирается сам при старте юнита
 
 sudo cp deploy/assistant.service /etc/systemd/system/padacha-assistant.service

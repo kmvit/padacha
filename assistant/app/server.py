@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.agent import GREETING, build_sdk
+from app.agent import GREETING
 from app.config import settings
 from app.dialogs import check_schema, create_conversation, save_exchange
 from app.kb import kb
@@ -53,7 +53,6 @@ limiter = IpLimiter(
 async def startup() -> None:
     settings.require_credentials()
     await asyncio.to_thread(check_schema)
-    build_sdk()
     # Модель — в лог первой строкой: незамеченный откат на дорогую модель
     # обнаруживается по счёту, а не по поведению, отвечает-то она хорошо.
     logger.info("Модель: %s", settings.llm_model)

@@ -20,9 +20,9 @@ def _list(name: str, default: str = "") -> list[str]:
 
 @dataclass(frozen=True)
 class Settings:
-    # Yandex AI Studio
-    folder_id: str
-    api_key: str
+    # MODO API
+    modo_base_url: str
+    modo_api_key: str
     llm_model: str
 
     # База знаний — снапшот продукта и сайта, собирается scripts/export_kb.py
@@ -54,12 +54,9 @@ class Settings:
             kb_path = BASE_DIR / kb_path
 
         return cls(
-            folder_id=os.getenv("YC_FOLDER_ID", "").strip(),
-            api_key=os.getenv("YC_API_KEY", "").strip(),
-            # Инструментов у ассистента нет — «не зовёт function calling»
-            # здесь не проблема, поэтому умолчание дешёвое. SDK сам дописывает
-            # версию: «/latest» в имени превращается в «…/latest/latest».
-            llm_model=os.getenv("LLM_MODEL", "yandexgpt-lite").strip().removesuffix("/latest"),
+            modo_base_url=os.getenv("MODO_BASE_URL", "http://127.0.0.1:8130/v1").strip().rstrip("/"),
+            modo_api_key=os.getenv("MODO_API_KEY", "").strip(),
+            llm_model=os.getenv("LLM_MODEL", "openai/gpt-4.1-nano").strip(),
             kb_path=kb_path,
             session_ttl_seconds=int(os.getenv("SESSION_TTL_SECONDS", "3600")),
             max_messages_per_session=int(os.getenv("MAX_MESSAGES_PER_SESSION", "40")),
@@ -78,13 +75,13 @@ class Settings:
     def require_credentials(self) -> None:
         missing = [
             name
-            for name, value in (("YC_FOLDER_ID", self.folder_id), ("YC_API_KEY", self.api_key))
+            for name, value in (("MODO_BASE_URL", self.modo_base_url), ("MODO_API_KEY", self.modo_api_key))
             if not value
         ]
         if missing:
             raise RuntimeError(
                 f"Не заданы переменные окружения: {', '.join(missing)}. "
-                "Скопируйте .env.example в .env и заполните доступы Yandex Cloud."
+                "Скопируйте .env.example в .env и заполните доступ к MODO."
             )
 
 
