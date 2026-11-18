@@ -45,6 +45,7 @@ h1, h2, h3 { font-weight: 600; line-height: 1.04; letter-spacing: -.06em; }
 .hero-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; margin-bottom: 44px; }
 h1 { font-size: clamp(72px, 8.8vw, 120px); line-height: .98; letter-spacing: -.07em; }
 h1 > span { color: var(--accent); }
+@media (min-width: 801px) { .hero-aside { flex: 0 1 345px; } }
 .hero-aside { padding-bottom: 5px; min-width: 260px; }
 .hero-aside > p { font-size: 18px; line-height: 1.5; margin-bottom: 24px; }
 .button, .contact .lead .btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 32px; min-height: 56px; padding: 14px 22px; background: var(--accent); border: 1px solid var(--accent); border-radius: 0; color: var(--dark); font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s, transform .2s; }
@@ -367,3 +368,8 @@ h3 { font-size: 32px; }
 .photo-note { color:var(--muted); font-size:15px; line-height:1.7; margin-top:20px; max-width:700px; }
 @media(max-width:800px){.photo-title{align-items:start;flex-direction:column}.photo-title>p{max-width:550px}.photo-grid{gap:12px}.photo-grid figcaption{padding:12px}.photo-grid figcaption span{font-size:14px}}
 @media(max-width:480px){.photo-studio{padding-top:55px;padding-bottom:55px}.photo-grid{grid-template-columns:1fr 1fr}.photo-grid figure:last-child{display:none}.photo-grid figcaption b{font-size:10px}.photo-grid figcaption span{font-size:13px}}
+
+.owner-report { margin-top: 24px; padding: 26px; border: 1px solid #53604d; }
+.owner-report h3 { font-size: 1.6rem; }
+.owner-report p { max-width: 65ch; margin: 14px 0; color: #b4beac; line-height: 1.6; }
+.owner-report a { text-decoration: underline; text-underline-offset: 4px; }

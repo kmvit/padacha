@@ -4,6 +4,14 @@
     { src: '/kitchen.webp', label: 'ЭКРАН КУХНИ', alt: 'Заказы и тайминги блюд на экране кухни Падачи' },
     { src: '/stock.webp', label: 'СКЛАД И ОСТАТКИ', alt: 'Остатки продуктов на складе в Падаче' }
   ];
+  var venue = document.querySelector('#call select[name="venue"]');
+  if (venue) {
+    document.querySelectorAll('a[data-venue]').forEach(function (link) {
+      link.addEventListener('click', function () {
+        venue.value = link.dataset.venue;
+      });
+    });
+  }
   var buttons = document.querySelectorAll('[data-stage]');
   buttons.forEach(function (button) {
     button.addEventListener('click', function () {
