@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/home-shift.css?v=8">
+<link rel="stylesheet" href="/home-shift.css?v=9">
 <!-- Yandex.Metrika: общий счётчик сайта -->
 <script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id={{ METRIKA }}','ym');ym({{ METRIKA }},'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});</script>
 {% if meta.jsonld %}<script type="application/ld+json">{{ meta.jsonld|safe }}</script>{% endif %}
@@ -56,17 +56,54 @@
     </div>
     <div class="format-strip"><span class="mono">ПОСЛЕ ПРИЁМА ЗАКАЗА</span><a href="/ekran-kuhni/">Кухня и бар ↗</a><a href="/sklad/">Склад и себестоимость ↗</a><a href="/oplata/#sales">Продажи по блюдам ↗</a></div>
   </div></section>
-  <section class="cash-section wrap" id="evotor" aria-labelledby="evotor-title">
-    <div class="cash-intro">
-      <p class="eyebrow">ОПЛАТА НА СТОЙКЕ</p>
-      <h2 id="evotor-title">Заказ из Падачи.<br>Чек на Эвоторе.</h2>
-      <p>Бариста отправляет позиции на смарт-терминал. После закрытия чека оплата появляется в заказе и в журнале владельца.</p>
-      <a class="button" href="/oplata/#evotor">Подробнее об Эвоторе</a>
-    </div>
-    <div class="cash-details">
-      <div><h3>Готовая сумма на кассе</h3><p>Кассир получает заказ с позициями и суммой к оплате, затем принимает наличные или карту.</p></div>
-      <div><h3>Полный и частичный возврат</h3><p>Кассир оформляет возврат на Эвоторе. Подтверждённый чек связывается с исходной продажей.</p></div>
-      <div><h3>Оплата до или после приготовления</h3><p>Владелец выбирает порядок оплаты на стойке. Настройка действует для новых заказов с Эвотором или <a href="/oplata/#aqsi">aQsi</a>.</p></div>
+  <section class="backoffice" id="backoffice" aria-labelledby="backoffice-title">
+    <div class="wrap">
+      <div class="backoffice-heading">
+        <h2 id="backoffice-title">Бэк-офис заведения</h2>
+        <p>В кабинете владельца видно, что принесло выручку, куда ушли продукты и сколько выплатить команде. Здесь же можно обновить меню, настроить оплату и запустить программу лояльности.</p>
+      </div>
+      <div class="backoffice-grid">
+        <article>
+          <h3>Аналитика продаж</h3>
+          <p>Сравнивайте выручку, количество чеков и средний чек за день, неделю или месяц. В отчёте по блюдам видно, сколько порций продали и вернули и какую сумму принёс каждый товар.</p>
+          <a href="/oplata/#sales">Отчёты по продажам</a>
+        </article>
+        <article>
+          <h3>Управленческий учёт</h3>
+          <p>Смотрите прибыль за месяц с учётом себестоимости блюд, складских списаний, зарплаты и прочих расходов. Вносите аренду и другие расходы по статьям, чтобы видеть, из чего складывается результат.</p>
+        </article>
+        <article>
+          <h3>Склад и себестоимость</h3>
+          <p>Загружайте фото накладной, ведите техкарты и следите за остатками. Ингредиенты списываются по заказам, а ручные списания с причинами видны в журнале.</p>
+          <img src="/process-stock.webp" width="1536" height="1024" loading="lazy" alt="Сотрудник фотографирует накладную при приёмке продуктов">
+          <a href="/sklad/">Как устроен склад</a>
+        </article>
+        <article>
+          <h3>Команда и выплаты</h3>
+          <p>Назначайте сотрудникам роли, учитывайте выходы и часы. Настройте ставки и бонусы за продажи, чтобы по итогам смен сверить начисления в ведомости.</p>
+          <img src="/process-shift.webp" width="1536" height="1024" loading="lazy" alt="Команда кафе подводит итоги смены">
+          <a href="/personal/">Смены и зарплата</a>
+        </article>
+        <article>
+          <h3>Меню и стоп-лист</h3>
+          <p>Меняйте цены, фотографии, варианты порций и добавки. Когда блюдо закончилось, снимите его с продажи через стоп-лист.</p>
+          <a href="/qr-menu/">Меню для гостей</a>
+        </article>
+        <article>
+          <h3>Бонусы и база гостей</h3>
+          <p>Перенесите гостей и остатки бонусов из файла. Задайте приветственные бонусы, процент с покупок и правила, по которым гости или сотрудники могут их списывать.</p>
+          <a href="/oplata/">Оплата и бонусы для гостей</a>
+        </article>
+        <article id="evotor">
+          <h3>Оплата и сверка кассы</h3>
+          <p>В журнале отдельно видны наличные, оплата картой, онлайн-платежи и возвраты. Здесь можно сверить расчёты за смену, а в настройках выбрать подходящий способ оплаты и подключить совместимую кассу.</p>
+          <a href="/oplata/">Способы оплаты и совместимые кассы</a>
+        </article>
+      </div>
+      <div class="backoffice-demo">
+        <p>В демо выберите роль «Владелец», чтобы посмотреть сводку, заказы и отчёты.</p>
+        <a class="button" href="https://demo.padacha.ru" target="_blank" rel="noreferrer">Открыть бэк-офис в демо</a>
+      </div>
     </div>
   </section>
   <section class="dayflow wrap" id="dayflow">
@@ -79,17 +116,14 @@
     </div>
     <div class="video-feature"><div><p class="eyebrow">ПАДАЧА В ДЕЙСТВИИ</p><h3>Посмотрите смену<br>за пару минут.</h3><p>Путь заказа от гостя до кухни, кассы и учёта — на одном экране.</p></div><video controls playsinline preload="none" poster="/promo-poster.jpg" aria-label="Видео о работе Падачи"><source src="/promo.mp4" type="video/mp4">Ваш браузер не поддерживает видео.</video></div>
   </section>
-  <section class="backoffice" id="backoffice"><div class="wrap backoffice-inner"><div class="backoffice-heading"><p class="eyebrow">03 / ЗА КУЛИСАМИ</p><h2>Что заработало кафе<br>за смену?</h2><p>Какие блюда принесли выручку? Сколько продуктов списали? Сколько выплатить за смену? Ответы собраны в кабинете владельца.</p></div><div class="backoffice-grid"><article><span class="mono">СКЛАД / СЕБЕСТОИМОСТЬ</span><h3>Накладную — в кадр.<br>Остатки — на экран.</h3><p>Сфотографируйте накладную и проверьте распознанные позиции. По техкарте видно, как новая закупочная цена молока изменила себестоимость капучино.</p><img src="/process-stock.webp" width="1536" height="1024" loading="lazy" alt="Сотрудник фотографирует накладную при приёмке продуктов"><a href="/sklad/">Подробнее о складе ↗</a></article><article><span class="mono">СМЕНЫ / ЗАРПЛАТА</span><h3>Кто работал.<br>Сколько заработал.</h3><p>В ведомости видно, кто отработал смену, сколько часов зачтено и какой бонус начислен за продажи. Правила оплаты задаёт владелец.</p><img src="/process-shift.webp" width="1536" height="1024" loading="lazy" alt="Команда кафе подводит итоги смены"><a href="/personal/">Подробнее о команде ↗</a></article></div>
-    <div class="owner-report"><h3>Какие блюда покупали чаще?</h3><p>Выберите день, неделю или месяц. По каждому блюду видно, сколько порций продали, на какую сумму и сколько вернули. В демо выберите роль «Владелец» и откройте раздел «Заказы».</p><a href="https://demo.padacha.ru" target="_blank" rel="noreferrer">Посмотреть кабинет владельца ↗</a></div>
-  </div></section>
   <section class="pricing wrap" id="pricing"><div class="pricing-title"><div><p class="eyebrow">ТАРИФЫ</p><h2>Выберите тариф<br>по формату обслуживания.</h2></div><p>В обоих тарифах есть склад, себестоимость,<br>смены, зарплата, финансы и бонусы гостям.</p></div>
-    <div class="pricing-grid"><article class="plan"><div class="plan-heading"><span class="mono">01 / БЕЗ ЗАЛА</span><span class="plan-icon" aria-hidden="true">↗</span></div><h3>Стойка</h3><p>Гость заказывает у кассы и забирает заказ по номеру. Подходит и кофейне со столиками, если официант к ним не подходит.</p><div class="amount">3 990<span>₽ / месяц</span></div><ul><li>Приём заказов у кассы и по QR</li><li>Выдача по номеру, Эвотор и aQsi</li><li>Склад, смены и отчёты о продажах</li></ul><a class="button outline" href="#call" data-venue="counter">Подключить «Стойку» <span>↗</span></a></article>
+    <div class="pricing-grid"><article class="plan"><div class="plan-heading"><span class="mono">01 / БЕЗ ЗАЛА</span><span class="plan-icon" aria-hidden="true">↗</span></div><h3>Стойка</h3><p>Гость заказывает у кассы и забирает заказ по номеру. Подходит и кофейне со столиками, если официант к ним не подходит.</p><div class="amount">3 990<span>₽ / месяц</span></div><ul><li>Приём заказов у кассы и по QR</li><li>Оплата на кассе, выдача по номеру</li><li>Склад, смены и отчёты о продажах</li></ul><a class="button outline" href="#call" data-venue="counter">Подключить «Стойку» <span>↗</span></a></article>
     <article class="plan plan-hall"><div class="plan-heading"><span class="mono">02 / С ПОСАДКОЙ</span><span class="plan-icon" aria-hidden="true">✳</span></div><h3>Зал</h3><p>Официант ведёт стол от первого заказа до расчёта. Гости могут дозаказывать, а кухня и бар видят свои позиции.</p><div class="amount">5 990<span>₽ / месяц</span></div><ul><li>Заказы у официанта и по QR со стола</li><li>Экраны кухни и бара, тайминги</li><li>Склад, смены и отчёты о продажах</li></ul><a class="button" href="#call" data-venue="hall">Подключить «Зал» <span>↗</span></a></article></div>
     <div class="pricing-note"><span>Цена за одно заведение в месяц. Подключение, обучение и рабочие экраны входят в подписку. Комиссию за эквайринг определяет ваш банк.</span><a href="/sravnenie/">Сравнить с другими системами ↗</a></div>
   </section>
   <section class="launch wrap" id="launch"><div><p class="eyebrow">ПОДКЛЮЧЕНИЕ</p><h2>Поможем запустить.<br>Без счёта за внедрение.</h2><p>Перенесём меню, настроим столы и склад, покажем команде рабочие экраны. Подключение и обучение входят в тариф.</p><a href="#call">Обсудить запуск ↗</a></div><div class="launch-facts"><div><span>00 ₽</span><p>подключение и обучение</p></div><div><span>∞</span><p>рабочих экранов без доплаты</p></div><div><span>2 000 ₽</span><p>дополнительно: 100 генераций фото для меню; пакет не сгорает</p></div></div></section>
   <section class="photo-studio wrap" id="photos"><div class="photo-title"><div><p class="eyebrow">ДОПОЛНИТЕЛЬНО К ПОДПИСКЕ</p><h2>Своя посуда.<br>Готовые кадры.</h2></div><p>Загрузите один снимок стакана или тарелки — Падача поможет собрать фотографии блюд для меню в едином стиле.</p></div><div class="photo-grid"><figure><img src="/photo-sample.webp" width="760" height="760" alt="Исходное фото фирменного стакана" loading="lazy"><figcaption><b>01 / ВЫ ЗАГРУЖАЕТЕ</b><span>Фото вашей посуды</span></figcaption></figure><figure><img src="/photo-cappuccino.webp" width="760" height="760" alt="Сгенерированное фото капучино в фирменном стакане" loading="lazy"><figcaption><b>02 / ПАДАЧА СОЗДАЁТ</b><span>Капучино в вашем стакане</span></figcaption></figure><figure><img src="/photo-raf.webp" width="760" height="760" alt="Сгенерированное фото рафа в фирменном стакане" loading="lazy"><figcaption><b>03 / МЕНЮ ГОТОВО</b><span>Единый стиль кадров</span></figcaption></figure></div><p class="photo-note">В фотостудии можно задать эталон съёмки и уточнить кадр текстом. Гость видит пометку, что фото — иллюстрация. 100 генераций — 2 000 ₽; пакет не сгорает.</p></section>
-  <section class="faq wrap" id="faq"><div class="faq-heading"><p class="eyebrow">07 / ЧАСТЫЕ ВОПРОСЫ</p><h2>Что важно знать<br>до запуска.</h2></div><div class="faq-list"><details><summary>Можно ли посмотреть Падачу до подключения?<span aria-hidden="true">+</span></summary><p>Да. Откройте <a href="https://demo.padacha.ru" target="_blank" rel="noreferrer">демо</a> и выберите роль через «Демо-доступы». Или оставьте заявку, чтобы посмотреть систему на задачах вашего заведения.</p></details><details><summary>Чем «Стойка» отличается от «Зала»?<span aria-hidden="true">+</span></summary><p>«Стойка» рассчитана на выдачу по номеру без посадки. В «Зале» есть столы, официант и отдельные экраны кухни и бара. Склад, техкарты, себестоимость, смены и финансы входят в оба тарифа.</p></details><details><summary>Нужно ли покупать специальное оборудование?<span aria-hidden="true">+</span></summary><p>Рабочие экраны открываются в браузере на планшетах и телефонах. На стойке подключаются <a href="/oplata/#evotor">Эвотор</a> и <a href="/oplata/#aqsi">aQsi</a>. Владелец выбирает, принимать оплату до приготовления или после.</p></details><details><summary>Сколько стоят дополнительные экраны и обучение?<span aria-hidden="true">+</span></summary><p>Доплаты за число экранов нет. Подключение и обучение команды бесплатные. Отдельная платная возможность — фотостудия меню: 2 000 ₽ за 100 генераций.</p></details><details><summary>Обязательно ли использовать QR-меню?<span aria-hidden="true">+</span></summary><p>Можно работать без QR. Официант записывает заказ за столом, кассир принимает его у стойки. Гости также могут открыть QR-меню только для просмотра и назвать выбранные блюда сотруднику.</p></details></div></section>
+  <section class="faq wrap" id="faq"><div class="faq-heading"><p class="eyebrow">07 / ЧАСТЫЕ ВОПРОСЫ</p><h2>Что важно знать<br>до запуска.</h2></div><div class="faq-list"><details><summary>Можно ли посмотреть Падачу до подключения?<span aria-hidden="true">+</span></summary><p>Да. Откройте <a href="https://demo.padacha.ru" target="_blank" rel="noreferrer">демо</a> и выберите роль через «Демо-доступы». Или оставьте заявку, чтобы посмотреть систему на задачах вашего заведения.</p></details><details><summary>Чем «Стойка» отличается от «Зала»?<span aria-hidden="true">+</span></summary><p>«Стойка» рассчитана на выдачу по номеру без посадки. В «Зале» есть столы, официант и отдельные экраны кухни и бара. Склад, техкарты, себестоимость, смены и финансы входят в оба тарифа.</p></details><details><summary>Нужно ли покупать специальное оборудование?<span aria-hidden="true">+</span></summary><p>Рабочие экраны открываются в браузере на планшетах и телефонах. Если у вас уже есть касса, проверьте её в <a href="/oplata/">списке поддерживаемых касс</a>. С другой кассой сотрудник пробивает чек как обычно и отмечает оплату в Падаче.</p></details><details><summary>Сколько стоят дополнительные экраны и обучение?<span aria-hidden="true">+</span></summary><p>Доплаты за число экранов нет. Подключение и обучение команды бесплатные. Отдельная платная возможность — фотостудия меню: 2 000 ₽ за 100 генераций.</p></details><details><summary>Обязательно ли использовать QR-меню?<span aria-hidden="true">+</span></summary><p>Можно работать без QR. Официант записывает заказ за столом, кассир принимает его у стойки. Гости также могут открыть QR-меню только для просмотра и назвать выбранные блюда сотруднику.</p></details></div></section>
   <section class="contact" id="call"><div class="wrap contact-grid"><div><p class="eyebrow">08 / НАЧНЁМ С ВАШЕГО КАФЕ</p><h2>Посмотрите Падачу<br>на примере вашей точки.</h2><p>Расскажите, где гости делают заказ и как вы их рассчитываете. Покажем путь от первого заказа до отчёта за смену.</p><a class="contact-phone" href="tel:+79943121222">+7 994 312-12-22 ↗</a><a class="telegram" href="https://t.me/+79289557566" target="_blank" rel="noreferrer">Или напишите в Telegram ↗</a></div><div class="contact-form">{% include "partials/lead_form.html" %}</div></div></section>
 </main>
 <footer class="wrap footer"><div class="footer-top"><a class="brand" href="/">падача<span class="brand-symbol" aria-hidden="true">✳</span></a><span class="mono">ВСЁ РАБОТАЕТ ВМЕСТЕ.</span><a href="https://demo.padacha.ru" target="_blank" rel="noreferrer">Потрогать демо ↗</a></div><div class="footer-bottom"><span>© {% now "Y" %} {{ COMPANY.name }} · ИНН {{ COMPANY.inn }}</span><a href="mailto:{{ COMPANY.email }}">{{ COMPANY.email }}</a><a href="/soglasie/">Персональные данные</a></div></footer>
