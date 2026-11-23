@@ -134,9 +134,18 @@ def tariffs(page: str) -> dict:
             "кому": text(who.group(1)) if who else "",
             **plan_items(card),
         })
-    # У сайта два оформления (см. tools/theme.py), и тарифы в них свёрстаны
-    # по-разному. Знание о ценах одно, поэтому разбираем обе вёрстки: пустой
-    # список здесь означал бы, что ассистент вышел к клиенту без прайса.
+    # На действующей главной каждая карточка тарифа — отдельный article.
+    for card in re.findall(r'<article class="plan(?: [^"]*)?">(.*?)</article>', block, re.S):
+        name = re.search(r"<h3>(.*?)</h3>", card, re.S)
+        price = re.search(r'<div class="amount">([^<]+)<span>', card)
+        who = re.search(r"<p>(.*?)</p>", card, re.S)
+        if name and price and who:
+            plans.append({
+                "тариф": text(name.group(1)),
+                "в_месяц": text(price.group(1)) + " ₽",
+                "кому": text(who.group(1)),
+                **plan_items(card),
+            })
     if not plans:
         plans = riso_cards(page, block)
 
@@ -149,7 +158,7 @@ def tariffs(page: str) -> dict:
     ]
     if not extras:
         extras = riso_extras(block)
-    fine = re.search(r'<p class="fine">(.*?)</p>', block, re.S)
+    fine = re.search(r'<p class="(?:fine|pricing-note)">(.*?)</p>', block, re.S)
     return {
         "тарифы": plans,
         "дополнительно": extras,
