@@ -30,3 +30,7 @@
 .lead-msg.err { color: var(--heat); }
 .lead.sent .lead-grid, .lead.sent .lead-foot .btn, .lead.sent .lead-title { display: none; }
 @media (max-width: 640px) { .lead-grid { grid-template-columns: 1fr; } }
+
+.site-contacts { list-style:none; margin:24px 0; padding:0; text-align:left; }
+.site-contacts li { padding:8px 0; font-size:1rem; line-height:1.5; }
+.site-contacts a { color:inherit; text-decoration:underline; text-underline-offset:3px; }

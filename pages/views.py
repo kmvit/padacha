@@ -13,6 +13,7 @@ from django.views.static import serve
 from blog import markup
 from blog.models import Article
 
+from .contacts import with_contact_placeholder
 from .models import ARTICLES, LEAD_FORM, Page
 
 ORG = {"@type": "Organization", "name": "Падача", "url": f"{settings.SITE_URL}/"}
@@ -28,7 +29,9 @@ def page_meta(page: Page, **extra) -> dict:
 
 def fill(page: Page, request, meta: dict, **ctx) -> str:
     """Тело страницы с метками: форма заявки и карточки статей."""
-    body = page.body
+    body = with_contact_placeholder(page.body)
+    if "[[контакты]]" in body:
+        body = body.replace("[[контакты]]", render_to_string("partials/site_contacts.html", request=request))
     if LEAD_FORM in body:
         body = body.replace(LEAD_FORM, render_to_string("partials/lead_form.html", {"meta": meta}, request).rstrip("\n"))
     if ARTICLES in body:

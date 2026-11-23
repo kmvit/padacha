@@ -80,3 +80,25 @@ footer { background:var(--bg); border-top:1px solid var(--line); color:var(--ink
 .lead-consent { font-size:14px; }
 @media(max-width:900px){.wrap{width:min(100% - 44px,1260px)}.page-hero{padding:50px 0}.menu{background:var(--surface)}.drop-panel{background:transparent;border:0;box-shadow:none}}
 @media(max-width:560px){.nav .brand.lg{font-size:25px}.brand-symbol{font-size:28px}.page-hero h1{font-size:clamp(33px,10vw,43px)}.page-hero .lede{font-size:17px}.nav .btn.sm{font-size:13px}.nav{gap:10px}.card{padding:23px}}
+
+.landing-feature { background:var(--surface); scroll-margin-top:64px; }
+.feature-spread { display:grid; grid-template-columns:1.1fr 1fr; gap:clamp(24px,4vw,64px); align-items:center; }
+.feature-spread > img { display:block; width:100%; height:auto; }
+.feature-notes h3 { margin:22px 0 6px; font-size:clamp(21px,2vw,28px); }
+.feature-notes h3:first-child { margin-top:0; }
+.feature-notes h3 a { color:var(--heat); text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:4px; }
+.feature-notes p { margin:0; color:var(--ink-dim); }
+.portion-sheet { padding:clamp(16px,3vw,38px); background:#eeefe7; color:#171b15; }
+.portion-sheet table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.portion-sheet caption { text-align:left; font-size:clamp(20px,2vw,26px); font-weight:600; line-height:1.2; padding-bottom:18px; }
+.portion-sheet th,.portion-sheet td { padding:9px 0; border-bottom:1px solid #b7bcae; text-align:right; white-space:nowrap; }
+.portion-sheet th:first-child { text-align:left; }
+.portion-sheet thead { font-size:.82em; }
+.portion-sheet tbody th { font-weight:400; }
+.portion-sheet tfoot { font-weight:700; }
+.portion-sheet p { margin:18px 0 0; line-height:1.5; }
+@media(max-width:800px){.feature-spread{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:440px){.portion-sheet table{font-size:14px}}
+#kitchen-bar { scroll-margin-top:64px; }
+.page-hero .lede a[href="#kitchen-bar"], #kitchen-bar .feature-notes a { color:var(--heat); text-decoration:underline; text-underline-offset:3px; }
+#kitchen-bar .feature-notes p + p { margin-top:16px; }
